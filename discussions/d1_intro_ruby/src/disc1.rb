@@ -3,31 +3,45 @@
 # The class Table represents a collection of tuples.
 
 class Tuple
+    @hash = Hash.new{0}
 
     # data is an array of values for the tuple
     def initialize(data)
-        raise "unimplemented"
+	@data = data
+	@@hash[data.length] += 1
+        
     end
 
     # This method returns the data at a particular index of a tuple (0 indexing)
     # If the provided index exceeds the largest index in the tuple, nil should be returned.
     # index is an Integer representing a valid index in the tuple.
     def getData(index)
-        raise "unimplemented"
+	if index >= @data.length then
+	    return nil
+	else
+	return @data[index]
+        end
     end
 
+    def getSize()
+	return @data.length
+    end
     # This method should return the number of tuples of size n that have ever been created
     # hint: you should use a static variable
     # hint2: a hash can be helpful (though not strictly necessary!)
-    def self.getNumTuples(n) 
-        raise "unimplemented"
+    def self.getNumTuples(n)
+	 return @hash[n]
+        
     end
 end
 
 class Table
+    
     # column_names is an Array of Strings
     def initialize(column_names)
-        raise "unimplemented"
+	@column_names = column_names
+	@tuples = []
+        
     end
 
     # This method inserts a tuple into the table.
@@ -37,13 +51,29 @@ class Table
     # otherwise, DO NOT insert the tuple and return false instead.
     # tuple is an instance of class Tuple declared above.
     def insertTuple(tuple)
-        raise "unimplemented"
+	if column_names.length == tuple.getSize then
+	    @tuples.push(tuple);
+	    return true
+	else
+            return false
+	end
     end
     
     # Given a column name and a value, this method finds the number of rows where the value 
     # for the column matches the given value.
     def numRowsWhere(column,value)
-        raise "unimplemented" 
+	count = 0
+
+	column_index = @column_names.index(column);
+	for tuple in @tuples do
+	    
+	    if tuple.getData(column_index) == value then
+		count += 1
+	    end
+
+	end
+
+	return count
     end 
 
 end
