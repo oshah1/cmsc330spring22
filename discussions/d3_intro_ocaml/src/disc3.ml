@@ -1,5 +1,11 @@
+<<<<<<< HEAD
+=======
+(* Introduction *)
+>>>>>>> e1650d1d69b3b8bd6ce72c197bb97823b027679e
 
+let positive n = failwith "Not implemented"
 
+<<<<<<< HEAD
 
 let positive n = if n > 0 then "positive" 
   else if n < 0 then "negative" else "zero"
@@ -12,13 +18,37 @@ let fizz n =
   else if n mod 3 =0 then "fizz"
   else if n mod 5 =0 then "buzz"
   else ""
+=======
+let double x = failwith "Not implemented"
+
+let fizz n = failwith "Not implemented"
+
+(* Problems  *)
+
+let first_elem lst = failwith "Not implemented"
+
+let rec sum lst = failwith "Not implemented"
+>>>>>>> e1650d1d69b3b8bd6ce72c197bb97823b027679e
+
+let max_list lst = failwith "Not implemented"
+
+<<<<<<< HEAD
 
 
 
+=======
+let sum_tuple t = failwith "Not implemented"
 
+(* Multi-Function Problems *)
 
+let rec product lst = failwith "Not implemented"
 
+let rec max_product lst = failwith "Not implemented"
+>>>>>>> e1650d1d69b3b8bd6ce72c197bb97823b027679e
 
+let rec length l = failwith "Not implemented" 
+
+<<<<<<< HEAD
 let first_elem lst = 
   match lst with
 | h::t -> h
@@ -69,6 +99,11 @@ let check_matrix lst =
   match lst with
   | [] -> true
   | h::t -> check_matrix_aux lst (length h) (*compare other lists with length of head*)
+=======
+let rec check_matrix_aux lst len = failwith "Not implemented"
+
+let check_matrix lst = failwith "Not implemented"
+>>>>>>> e1650d1d69b3b8bd6ce72c197bb97823b027679e
 
 
 
