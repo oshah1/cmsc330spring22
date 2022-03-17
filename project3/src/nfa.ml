@@ -48,11 +48,14 @@ let rec move_helper (tr: ('q,'s) transition list) (state: 'q) (s: 's option) : '
   
 let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
   let transitions = nfa.delta in
+  (*union two lists together*)
   let union lst1 lst2 =
+    (*if lst1 already contains the head, don't cons it to lst1*)
+    fold_right (fun x a -> if contains lst1 x then a else x::a) lst1 lst2 in
   (*move_helper returns a list of final states reachable with a
   transition from a given state and character
   fold right on the list move_helper returns*)
-  fold_right (fun h acc -> fold_right (fun x a-> x::a) (move_helper transitions h s) acc) qs []   acc
+  fold_right (fun h acc -> union acc (move_helper transitions h s) ) qs []
   
   
 
