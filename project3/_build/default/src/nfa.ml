@@ -66,13 +66,13 @@ let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
   let transitions = nfa.delta in
 
-  let output = union [] (fold_right (fun x acc -> match x with
-                  | (a,b,c) -> a::acc) transitions []) in
+  let output = fold_right (fun x acc -> match x with
+                  | (a,b,c) -> a::acc) transitions [] in
   
   let e_transitions = move nfa qs None in
 
-  union output
-  failwith "unimplemented"
+  union output e_transitions
+  
 
 let accept (nfa: ('q,char) nfa_t) (s: string) : bool =
   failwith "unimplemented"
