@@ -53,7 +53,7 @@ class PublicTests < MiniTest::Test
         for i in @p2_perf_atk
             assert(test_board.attack_pos(i), "Attack that should hit did not")
         end
-
+        
         # Property: Nothing will change for a miss
         refute(test_board.attack_pos(Position.new(2, 1)), "Attack should have missed but hit")
     end
@@ -87,8 +87,10 @@ class PublicTests < MiniTest::Test
 
         game = GameController.new(2)
         p1_brd = game.load_ships(SHIPS_P1, 1)
+        puts p1_brd.to_s
         p1_atk = game.load_attacks(PERF_ATK_P1, 1)
         p2_brd = game.load_ships(SHIPS_P2, 2)
+        puts p2_brd.to_s
         p2_atk = game.load_attacks(PERF_ATK_P2, 1)
 
         pos0 = Position.new(2,1)
@@ -103,6 +105,8 @@ class PublicTests < MiniTest::Test
         ret = p1_brd.attack_pos(pos3) && ret
 
         p1_brd.attack_pos(pos0)
+        
+        
         assert(ret, "A boat is expected to be attacked but is not")
         assert_equal(3, p1_brd.num_successful_attacks, "The number of hits needs to be correct")
     end

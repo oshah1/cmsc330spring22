@@ -15,7 +15,9 @@ val map_put: int -> 'a -> 'a tree_map -> 'a tree_map
 val map_contains: int -> 'a tree_map -> bool
 val map_get: int -> 'a tree_map -> 'a
 
-type lookup_table
+type lookup_table = 
+    | TailTable
+    | HeadTable of ((string * int) list) * lookup_table
 val empty_table : lookup_table
 val push_scope : lookup_table -> lookup_table
 val pop_scope : lookup_table -> lookup_table

@@ -30,8 +30,31 @@ let explode (s: string) : char list =
 (* Part 1: NFAs *)
 (****************)
 
+let rec contains lst item =
+  match lst with
+  | [] -> false
+  | h::t -> if h = item then true else contains t item
+
+let rec move_helper (tr: ('q,'s) transition list) (state: 'q) (s: 's option) : 'q list =
+  match s with
+    | None -> (match tr with
+                | [] -> []
+                | (a, None, c)::t -> if a=state then c::(move_helper t state s) else move_helper t state s
+                | (_,_,_)::t -> move_helper t state s)
+    | Some ch -> (match tr with
+                  | [] -> []
+                  | (a, Some b, c)::t -> if a = state && b = ch then c::(move_helper t state s) else move_helper t state s
+                  | (_,_,_)::t -> move_helper t state s)
+  
 let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
-  failwith "unimplemented"
+  let transitions = nfa.delta in
+  let union lst1 lst2 =
+  (*move_helper returns a list of final states reachable with a
+  transition from a given state and character
+  fold right on the list move_helper returns*)
+  fold_right (fun h acc -> fold_right (fun x a-> x::a) (move_helper transitions h s) acc) qs []   acc
+  
+  
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
   failwith "unimplemented"

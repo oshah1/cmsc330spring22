@@ -3,12 +3,12 @@
 # The class Table represents a collection of tuples.
 
 class Tuple
-    @hash = Hash.new{0}
+    @hash = Hash.new(0)
 
     # data is an array of values for the tuple
     def initialize(data)
 	@data = data
-	@@hash[data.length] += 1
+	@@hash[data.size] += 1
         
     end
 
@@ -16,7 +16,7 @@ class Tuple
     # If the provided index exceeds the largest index in the tuple, nil should be returned.
     # index is an Integer representing a valid index in the tuple.
     def getData(index)
-	if index >= @data.length then
+	if index > (getSize() -1) then
 	    return nil
 	else
 	return @data[index]
@@ -24,7 +24,7 @@ class Tuple
     end
 
     def getSize()
-	return @data.length
+	return @data.size
     end
     # This method should return the number of tuples of size n that have ever been created
     # hint: you should use a static variable
@@ -39,8 +39,8 @@ class Table
     
     # column_names is an Array of Strings
     def initialize(column_names)
-	@column_names = column_names
-	@tuples = []
+	@column_names = column_names;
+	@tuples = [];
         
     end
 
@@ -51,12 +51,16 @@ class Table
     # otherwise, DO NOT insert the tuple and return false instead.
     # tuple is an instance of class Tuple declared above.
     def insertTuple(tuple)
-	if column_names.length == tuple.getSize then
-	    @tuples.push(tuple);
-	    return true
-	else
-            return false
-	end
+        col_length = @column_names.length
+
+	tuple_size = tuple.getSize;
+
+        if tuple_size != col_length then
+            false
+        else
+            @tuples.push(tuple);
+            true
+        end
     end
     
     # Given a column name and a value, this method finds the number of rows where the value 

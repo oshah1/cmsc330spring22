@@ -1,5 +1,5 @@
 open Funs
-
+open Higher
 (*************************************)
 (* Part 2: Three-Way Search Tree *)
 (*************************************)
@@ -21,13 +21,15 @@ let rec int_insert x t =
     all branches are IntLeaf, so we just add x to this node
   First int must be smaller than second int, if x is less than
     a, x is the new first integer. Otherwise, a is the first*)
-  | IntNode (a,None, _, _ ,_) -> if x < a then IntNode (x, Some a, IntLeaf, IntLeaf, IntLeaf)
-                                      else IntNode (a, Some x, IntLeaf, IntLeaf, IntLeaf)
+  | IntNode (a,None, b, c ,d) -> if x < a then IntNode (x, Some a, b, c, d)
+                                      else if x > a then IntNode (a, Some x, b, c, d)
+                                      else t
   | IntNode (a, Some b, c, d, e) -> if x < a then IntNode (a, Some b, int_insert x c, d, e) else 
                                             if x > a && x < b then
-                                            IntNode(a, Some b, c, int_insert x d, e)  else if a > x then 
+                                            IntNode(a, Some b, c, int_insert x d, e)  
+                                            else if x > b then 
                                               IntNode (a, Some b, c ,d,int_insert x e) else t
-  | IntNode (_,_,_,_,_)-> invalid_arg "int_insert: Invalid tree"
+  
   
 
 let rec int_mem x t =
@@ -39,7 +41,7 @@ let rec int_mem x t =
                                               int_mem x c 
                                             else if x > a && x < b then
                                              int_mem x d else int_mem x e
-    | IntNode (a, _, _, _, _) -> invalid_arg "int_mem"
+    
 
 let rec int_size t =
   match t with
@@ -56,8 +58,7 @@ let rec int_max t =
   | IntNode (a, None, _, _, _) -> a
   | IntNode (a, Some b, _, _, e) -> try
                                       max a (max b (int_max e))
-                                    with
-                                      Invalid_argument "int_max" -> max a b
+                                    with e -> max a b
 
 (*******************************)
 (* Part 3: Three-Way Search Tree-Based Map *)
@@ -72,44 +73,95 @@ let empty_tree_map = MapLeaf
 let rec map_put k v t = 
   match t with
   | MapLeaf -> MapNode ((k,v), None, MapLeaf, MapLeaf, MapLeaf)
-  | MapNode ((a, b), None, c, d, e) -> if k < a then
-                                        MapNode ((k,v), Some (a,b), MapLeaf, MapLeaf, MapLeaf)
+  | MapNode ((a, b), None, c, d, e) -> if k = a then
+                                        invalid_arg "map_put"
+                                         else if k < a then
+                                        MapNode ((k,v), Some (a,b), c, d, e)
                                         else if k > a then
-                                          MapNode ((a,b), Some (k, v), MapLeaf, MapLeaf, MapLeaf)
+                                          MapNode ((a,b), Some (k, v), c, d, e)
                                         else
                                         invalid_arg "map_put"
-  | MapNode ((a,av), Some (b,bv), c, d, e) -> if k < a then
-                                        MapNode ((a, av), Some (a, bv), map_put k v c, d, e)
+  | MapNode ((a,av), Some (b,bv), c, d, e) -> 
+                                      if k = a || k =b then
+                                      invalid_arg "map_put"
+                                       else if k < a then
+                                        MapNode ((a, av), Some (b, bv), (map_put k v c), d, e)
                                         else if k > a && k < b then
                                           MapNode ( (a,av), Some (b,bv), c, map_put k v d, e)
                                         else if k > b then
-                                          MapNode ((a,av), Some (a,bv), c, d, map_put k v e)
+                                          MapNode ((a,av), Some (b,bv), c, d, map_put k v e)
                                         else
                                         invalid_arg "map_put"
 
 let rec map_contains k t = 
-  failwith "unimplemented"
+  match t with
+  | MapLeaf -> false
+  | MapNode ((a, b), None, c, d, e) -> if k < a then map_contains k c else if k = a then
+                                        true else
+                                            false
+  | MapNode ((ak,av), Some (bk,bv), c, d, e) -> if k = ak || k = bk then
+                                                true
+                                              else if k < ak then
+                                                map_contains k c
+                                              else if k > ak && k < bk then
+                                                map_contains k d
+                                              else if k > bk then
+                                                map_contains k e
+                                                else
+                                                invalid_arg "map_contains"
 
 let rec map_get k t =
-  failwith "unimplemented"
+  match t with
+  | MapLeaf -> invalid_arg "map_get"
+  | MapNode ((a, b), None, c, d, e) -> if k = a then b else if k < a then
+                                        map_get k c else invalid_arg "map_get"
+  | MapNode ((ak,av), Some (bk,bv), c, d, e) -> if k = ak then av 
+                                                else if k = bk then bv 
+                                                else if k < ak then
+                                                  map_get k c
+                                                else if k > ak && k < bk then
+                                                  map_get k d else 
+                                                    map_get k e
+
 
 (***************************)
 (* Part 4: Variable Lookup *)
 (***************************)
 
 (* Modify the next line to your intended type *)
-type lookup_table = unit
+(*Acts sort of like a linked list
+tuple containing a list of string * int tuple and a lookup_table object, which is
+the previous scope*)
+type lookup_table =
+| TailTable
+| HeadTable of ((string * int) list) * lookup_table
 
-let empty_table : lookup_table = ()
+let empty_table : lookup_table = TailTable
 
-let push_scope (table : lookup_table) : lookup_table = 
-  failwith "unimplemented"
+let push_scope (table : lookup_table) : lookup_table =
+  match table with
+  | TailTable -> HeadTable ([], table)
+  | HeadTable (_, _) -> HeadTable ([],table)
+  
 
 let pop_scope (table : lookup_table) : lookup_table =
-  failwith "unimplemented"
+  match table with
+  | TailTable -> failwith "No scopes remain!"
+  | HeadTable (_, x) -> x
 
 let add_var name value (table : lookup_table) : lookup_table =
-  failwith "unimplemented"
+  let new_var = (name, value) in
+  match table with
+  | TailTable -> failwith "There are no scopes to add a variable to!"
+  | HeadTable (lst, x) -> if contains_elem lst new_var then failwith "Duplicate variable binding in scope!"
+                                            else HeadTable ((new_var::lst),x)
+
+let rec search_elem lst name=
+  match lst with
+  | [] -> failwith "Variable not found!"
+  | (a,b)::t -> if a = name then b else search_elem t name
 
 let rec lookup name (table : lookup_table) =
-  failwith "unimplemented"
+  match table with
+  | TailTable -> failwith "No Scope!"
+  | HeadTable (lst,t)-> search_elem lst name
