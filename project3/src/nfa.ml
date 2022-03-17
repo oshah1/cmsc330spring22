@@ -45,13 +45,17 @@ let rec move_helper (tr: ('q,'s) transition list) (state: 'q) (s: 's option) : '
                   | [] -> []
                   | (a, Some b, c)::t -> if a = state && b = ch then c::(move_helper t state s) else move_helper t state s
                   | (_,_,_)::t -> move_helper t state s)
-  
+
+
+let union lst1 lst2 =
+  (*if lst1 already contains the head, don't cons it to lst1*)
+  fold_right (fun x a -> if contains lst1 x then a else x::a) lst1 lst2
+
+
 let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
   let transitions = nfa.delta in
   (*union two lists together*)
-  let union lst1 lst2 =
-    (*if lst1 already contains the head, don't cons it to lst1*)
-    fold_right (fun x a -> if contains lst1 x then a else x::a) lst1 lst2 in
+  
   (*move_helper returns a list of final states reachable with a
   transition from a given state and character
   fold right on the list move_helper returns*)
@@ -60,6 +64,14 @@ let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
   
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
+  let transitions = nfa.delta in
+
+  let output = union [] (fold_right (fun x acc -> match x with
+                  | (a,b,c) -> a::acc) transitions []) in
+  
+  let e_transitions = move nfa qs None in
+
+  fold_right (fun x a -> if) e_transitions
   failwith "unimplemented"
 
 let accept (nfa: ('q,char) nfa_t) (s: string) : bool =

@@ -1,0 +1,12 @@
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Start test public:0:is_elem.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Test public:0:is_elem is successful.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: End test public:0:is_elem.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Start test public:4:assoc_list.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Test public:4:assoc_list is successful.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: End test public:4:assoc_list.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Start test public:6:insert_and_max.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Test public:6:insert_and_max is successful.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: End test public:6:insert_and_max.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Start test public:9:tree_map_put_and_get.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: Test public:9:tree_map_put_and_get is successful.
+2022-03-07T23:20:31+00:00 DESKTOP-HKRIS4L#01 I: End test public:9:tree_map_put_and_get.

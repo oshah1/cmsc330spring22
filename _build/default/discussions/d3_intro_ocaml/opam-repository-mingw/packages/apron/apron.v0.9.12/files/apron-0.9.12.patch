@@ -1,0 +1,37 @@
+--- ./configure
++++ ./configure
+@@ -314,8 +314,21 @@
+ 	;;
+     *)
+ 	cc_compilers="$CC cc gcc clang"
++        case $(ocamlfind ocamlc -config | awk -F '[\t\r ]+' '/^system:/ {print $2}') in
++            mingw*)
++                cxx_compilers=$(ocamlfind ocamlc -config | awk -F '[\t\r ]+' '/^bytecomp_c_compiler/ {print $2}' | sed 's|gcc|g++|g')
++                if [ -n "$CC" ] && [ -z "$CXX" ]; then
++                    cxx_compilers_tmp=$(echo "$CC" | sed 's|gcc|g++|g')
++                    cxx_compilers="$CXX $cxx_compilers_tmp $cxx_compilers c++ g++ clang++"
++                else
++                    cxx_compilers="$CXX $cxx_compilers c++ g++ clang++"
++                fi
++                ;;
++            *)
+ 	cxx_compilers="$CXX c++ g++ clang++"
+ 	;;
++        esac
++        ;;
+ esac
+ 
+ 
+@@ -361,8 +374,10 @@
+ 
+ # tools
+ 
+-searchbinreq "ar"; ar="$path"
+-searchbinreq "ranlib"; ranlib="$path"
++tmp_ranlib=$(ocamlfind ocamlc -config | awk -F '[\t\r ]+' '/^ranlib:/ {print $2}')
++tmp_ar=$(echo "$tmp_ranlib" | sed 's|ranlib|ar|g')
++searchbinreq "$tmp_ar"; ar="$path"
++searchbinreq "$tmp_ranlib"; ranlib="$path"
+ searchbinreq "sed"; sed="$path"
+ #searchbinreq "perl"; perl="$path"
+ searchbinreq "install"; install="$path"

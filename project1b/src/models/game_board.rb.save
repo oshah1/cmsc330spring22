@@ -1,0 +1,102 @@
+class GameBoard
+    # @max_row is an `Integer`
+    # @max_column is an `Integer`
+    attr_reader :max_row, :max_column
+
+    def initialize(max_row, max_column)
+        @max_row = max_row
+        @max_column = max_column
+	@num_ships = 0
+	@num_attacks = 0
+	#an array to hold each ship object
+	@ships = Array.new
+	@attacks = Array.new
+	#and a 3D array to store a representation of the board
+	#y-axis: row, x-axis, col, z-axis: index 0: if a ship occupies that cell, ined 1: if an attack 
+	#was made at that cell  
+	@board = Array.new(max_row) {Array.new(max_column) {Array.new(2,false)}}
+    end
+	#note: position coordinates start at 1
+
+    # adds a Ship object to the GameBoard
+    # returns Boolean
+    # Returns true on successfully added the ship, false otherwise
+    # Note that Position pair starts from 1 to max_row/max_column
+    def add_ship(ship)
+	#check if the starting position is out of bounds
+	ship_row = ship.position.row
+	ship_col = ship_position.col
+	if (ship_row < 1) || (ship_row > @max_row) || (ship_col < 1) || (ship_col > @max_column) then
+	    return false
+	end
+	#check ship orientation
+	if ship.orientation == "Up" then
+	# if the ship is pointing up then we need to check if it's going to
+	#cross the top of the board
+	    if ((ship_row) - ship.size) < 0 then
+		return false
+	    end
+	    #loop through the board, starting at the starting row of the current ship
+	    i = ship_row -1
+	    while i >=0 do
+		#if cell at board[i][ship.position.col] has a ship, return false
+		if @board[i][ship_col - 1][0] then
+		    return false
+		end
+		i -= 1
+	    end
+	    
+	    #edit the board
+	    for i in (ship_row -ship.size)..(ship_row-1) do
+		@board[i][ship_col-1]][0] = true
+	    end
+	elsif ship.orientation == "Down" then
+	    #if the ship is pointing down, check if it will cross the bottom of the board
+            if (ship_row + ship.size) > @max_row then
+		return false
+	    end
+	    #check if the ship will overlap with ships already on the board
+	    #loop through rows, starting at the index where the ship starts on the board and ends
+	    #where the ship will end
+	    for i in (ship_row-1)..(ship_row + ship.size -1) do
+		if @board[i][ship_col-1][0] then
+		    return false
+		end
+	    end
+	    
+	true	
+	end
+	#add ship to @ships and increment num_ships
+	@num_ships+=1
+	@ships >> ship
+    end
+
+    # return Boolean on whether attack was successful or not (hit a ship?)
+    # return nil if Position is invalid (out of the boundary defined)
+    def attack_pos(position)
+        # check position
+
+        # update your grid
+
+        # return whether the attack was successful or not
+        true
+    end
+
+    # Number of successful attacks made by the "opponent" on this player GameBoard
+    def num_successful_attacks
+        0
+    end
+
+    # returns Boolean
+    # returns True if all the ships are sunk.
+    # Return false if at least one ship hasn't sunk.
+    def all_sunk?
+        true
+    end
+
+
+    # String representation of GameBoard (optional but recommended)
+    def to_s
+        "STRING METHOD IS NOT IMPLEMENTED"
+    end
+end

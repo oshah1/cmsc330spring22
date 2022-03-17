@@ -1,0 +1,46 @@
+--- ./Makefile.in
++++ ./Makefile.in
+@@ -47,6 +47,7 @@
+ DEBUG    =
+ FLAGS    = $(ZLIBS) $(DEBUG)
+ PROFILE  =
++STRIP:=$(shell $(OCAMLC) -config | awk -F '[\t\r ]+' '/^ranlib:/ {print $$2}' | sed 's|ranlib|strip|g')
+ 
+ STRLIB =
+ 
+@@ -112,7 +113,7 @@
+ 
+ bibtex2html$(EXE): $(OBJS)
+ 	$(OCAMLOPT) $(PROFILE) $(FLAGS) -o bibtex2html$(EXE) str.cmxa $(OBJS) $(STRLIB)
+-	strip bibtex2html$(EXE)
++	$(STRIP) bibtex2html$(EXE)
+ 
+ bibtex2html.byte: $(OBJS:.cmx=.cmo)
+ 	$(OCAMLC) $(PROFILE) $(FLAGS)-o bibtex2html.byte str.cma $(OBJS:.cmx=.cmo) $(STRLIB)
+@@ -123,7 +124,7 @@
+ 
+ bibtex2html.static: $(OBJS)
+ 	$(OCAMLOPT) $(PROFILE) $(FLAGS) -o $@ str.cmxa $(OBJS) $(STRLIB) -cclib "-L. -static"
+-	strip $@
++	$(STRIP) $@
+ 
+ SRC=$(OBJS:.cmx=.ml)
+ bibtex2html.dfc: $(SRC)
+@@ -132,7 +133,7 @@
+ 
+ bib2bib$(EXE): $(BIB2BIBOBJS)
+ 	$(OCAMLOPT) $(PROFILE) $(FLAGS) -o bib2bib$(EXE) str.cmxa $(BIB2BIBOBJS) $(STRLIB)
+-	strip bib2bib$(EXE)
++	$(STRIP) bib2bib$(EXE)
+ 
+ bib2bib.byte: $(BIB2BIBOBJS:.cmx=.cmo)
+ 	$(OCAMLC)  $(PROFILE) $(FLAGS) -o bib2bib.byte str.cma $(BIB2BIBOBJS:.cmx=.cmo) $(STRLIB)
+@@ -143,7 +144,7 @@
+ 
+ bib2bib.static: $(BIB2BIBOBJS)
+ 	$(OCAMLOPT) $(PROFILE) $(FLAGS) -o $@ str.cmxa $(BIB2BIBOBJS) $(STRLIB) -cclib "-L. -static"
+-	strip $@
++	$(STRIP) $@
+ 
+ static: bibtex2html.static bib2bib.static
+ 	cp bibtex2html.static $$HOME/bin/$(OSTYPE)/bibtex2html

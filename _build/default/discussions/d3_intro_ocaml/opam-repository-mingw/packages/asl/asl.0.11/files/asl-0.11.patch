@@ -1,0 +1,20 @@
+--- ./lib/asl_stubs.c
++++ ./lib/asl_stubs.c
+@@ -70,14 +70,14 @@
+   CAMLreturn(result);
+ }
+ 
+-CAMLprim value stub_asl_open(value ident, value facility, value stderr, value no_delay, value no_remote) {
+-  CAMLparam5(ident, facility, stderr, no_delay, no_remote);
++CAMLprim value stub_asl_open(value ident, value facility, value ostderr, value no_delay, value no_remote) {
++  CAMLparam5(ident, facility, ostderr, no_delay, no_remote);
+   CAMLlocal1(result);
+ #ifdef __APPLE__
+   const char *c_ident = String_val(ident);
+   const char *c_facility = String_val(facility);
+   uint32_t options =
+-      (Bool_val(stderr)?ASL_OPT_STDERR:0)
++      (Bool_val(ostderr)?ASL_OPT_STDERR:0)
+     | (Bool_val(no_delay)?ASL_OPT_NO_DELAY:0)
+     | (Bool_val(no_remote)?ASL_OPT_NO_REMOTE:0);
+   aslclient asl = NULL;
