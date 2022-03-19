@@ -75,6 +75,9 @@ let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
   
 
 let accept (nfa: ('q,char) nfa_t) (s: string) : bool =
+  let string_arr = explode s in
+  let nfa_final = nfa.fs in
+  
   failwith "unimplemented"
 
 (*******************************)
