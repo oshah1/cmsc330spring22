@@ -1,10 +1,10 @@
 # dune build
 # OCAMLPARAM: unset
 # Workspace root: /home/fire21_oshah1/cmsc330spring22/project3
-$ /usr/bin/nproc > /tmp/dunebe5475.output 2> /dev/null
+$ /usr/bin/nproc > /tmp/dune5e7889.output 2> /dev/null
 # Auto-detected concurrency: 8
 # disable binary cache
-$ /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -config > /tmp/dunecc3f80.output
+$ /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -config > /tmp/dune8e511c.output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -115,26 +115,13 @@ $ /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -config > /tmp/dunecc3f80.outp
 #  }
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamldep.opt -modules -impl src/nfa.ml) > _build/default/src/.p3.objs/nfa.ml.d
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27-39-33-32 -g -bin-annot -I src/.p3.objs/byte -intf-suffix .ml -no-alias-deps -opaque -open P3 -o src/.p3.objs/byte/p3__Nfa.cmo -c -impl src/nfa.ml)
-> File "src/nfa.ml", line 125, characters 25-88:
-> 125 |   fold_right (fun x a -> new_states_helper (get_character_transitions nfa nfa.sigma x a)) qs []
->                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Error (warning 5 [ignored-partial-application]): this function application is partial,
-> maybe some arguments are missing.
-> File "src/nfa.ml", line 125, characters 25-88:
-> 125 |   fold_right (fun x a -> new_states_helper (get_character_transitions nfa nfa.sigma x a)) qs []
->                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Error: This expression has type 'q list list -> 'q list list
->        but an expression was expected of type 'q list list
-[2]
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27-39-33-32 -g -a -o src/p3.cma src/.p3.objs/byte/p3.cmo src/.p3.objs/byte/p3__Sets.cmo src/.p3.objs/byte/p3__Nfa.cmo src/.p3.objs/byte/p3__Regexp.cmo)
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27-39-33-32 -g -I src/.p3.objs/byte -I src/.p3.objs/native -intf-suffix .ml -no-alias-deps -opaque -open P3 -o src/.p3.objs/native/p3__Nfa.cmx -c -impl src/nfa.ml)
-> File "src/nfa.ml", line 125, characters 25-88:
-> 125 |   fold_right (fun x a -> new_states_helper (get_character_transitions nfa nfa.sigma x a)) qs []
->                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Error (warning 5 [ignored-partial-application]): this function application is partial,
-> maybe some arguments are missing.
-> File "src/nfa.ml", line 125, characters 25-88:
-> 125 |   fold_right (fun x a -> new_states_helper (get_character_transitions nfa nfa.sigma x a)) qs []
->                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Error: This expression has type 'q list list -> 'q list list
->        but an expression was expected of type 'q list list
-[2]
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27-39-33-32 -g -a -o src/p3.cmxa src/.p3.objs/native/p3.cmx src/.p3.objs/native/p3__Sets.cmx src/.p3.objs/native/p3__Nfa.cmx src/.p3.objs/native/p3__Regexp.cmx)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o bin/viz.bc /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cma src/p3.cma bin/.viz.eobjs/byte/dune__exe__Viz.cmo)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o test/pbt/pbt.bc /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/qcheck_core.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/runner/qcheck_runner.cma /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-ounit/qcheck_ounit.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck/qcheck.cma /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cma src/p3.cma test/testUtils.cma test/pbt/.pbt.eobjs/byte/dune__exe__Pbt.cmo)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o test/public/public.bc /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cma src/p3.cma /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cma /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cma test/testUtils.cma test/public/.public.eobjs/byte/dune__exe__Public.cmo)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27-39-33-32 -g -shared -linkall -I src -o src/p3.cmxs src/p3.cmxa)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o bin/viz.exe /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml src/p3.cmxa bin/.viz.eobjs/native/dune__exe__Viz.cmx)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o test/public/public.exe /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml src/p3.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cmxa test/testUtils.cmxa test/public/.public.eobjs/native/dune__exe__Public.cmx)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o test/pbt/pbt.exe /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/qcheck_core.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/runner/qcheck_runner.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-ounit/qcheck_ounit.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck/qcheck.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml src/p3.cmxa test/testUtils.cmxa test/pbt/.pbt.eobjs/native/dune__exe__Pbt.cmx)

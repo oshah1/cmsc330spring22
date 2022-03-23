@@ -105,24 +105,33 @@ let accept (nfa: ('q, 's) nfa_t) (s: string) : bool =
 (* Part 2: Subset Construction *)
 (*******************************)
 
+let rec concat lst1 lst2 =
+  match lst1 with
+  [] -> lst2
+  | h::t -> concat t (h::lst2)
 
 
+(*returns a list of all transitions possible from a given state with all letters in an nfa's alphabet*)
+let rec get_character_transitions (nfa: ('q,'s) nfa_t) (sigma: 's list) (state: 'q) : 'q list list =
+let transitions c = move nfa [state] (Some c) in
+let epsilon c= e_closure nfa (transitions c) in
+let all_transitions c = union (transitions c) (epsilon c) in
 
-let rec get_character_transitions (nfa: ('q,'s) nfa_t) (sigma: 's list) (state: 'q) (output: 'q list list): 'q list list =
-  let character_transitions (nfa: ('q,'s) nfa_t) (state: 'q) (ch: 's): 'q list =  move nfa [state] (Some ch) in
-  match sigma with
-  | [] -> output
-  | h::t -> output
+match sigma with
+| [] -> []
+| h::t -> (all_transitions h)::(get_character_transitions nfa t state)
 
-
-let new_states_helper (states: 'q list list) (acc: 'q list list): 'q list list=
-  fold_right (fun x a -> x::a) states acc
+  (*gets all the character transitions possible on a single state (incl epsilon transitions) and concatenates them
+  to an accumulator*)
+let rec new_states_helper (nfa: ('q,'s) nfa_t) (states: 'q list) (sigma: 's list) (acc: 'q list list): 'q list list=
+  match states with
+  | [] -> acc
+  | h::t -> concat acc (get_character_transitions nfa sigma h)
 
 let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   
   (*get the alphabet we will be using for getting the sets of states*)
-  
-  fold_right (fun x a -> new_states_helper (get_character_transitions nfa nfa.sigma x a)) qs []
+  new_states_helper nfa qs nfa.sigma []
 
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
   failwith "unimplemented"
