@@ -135,11 +135,12 @@ let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
 
 
 
-let new_trans_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
+
 
 
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
 
+  let new_trans_helper (state: 'q) (qs: 'q list) : ('q list, 's) transition list =
   failwith "unimplemented"
 
 let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
