@@ -133,7 +133,34 @@ let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   (*get the alphabet we will be using for getting the sets of states*)
   new_states_helper nfa qs nfa.sigma []
 
+
+
+let rec new_trans_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('a * 'b) list =
+  let sigma = nfa.sigma in
+match qs with
+| [] -> []
+| h::t -> let ch_transitions = fold_right (fun x a-> (Some x, move nfa [h] (Some x))::a) sigma [] in
+      if contains nfa.qs h then
+        (*now, add any e_transitions*)
+        let add_epsilon = map (fun (x, y) -> (x, union y (e_closure nfa y))) ch_transitions in
+        concat add_epsilon (new_trans_helper nfa t)
+      else
+        concat ch_transitions (new_trans_helper nfa t)
+
+
+
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
+  (*must return: list of q list, s transitions
+  How to construct: ([transition list], char, end state)
+  1: Send list of states to a recursive function
+  - Function will take list of states, a list of characters, and and accumulator and
+  return a list of q list s transitions
+  2: For each state, call move on it and every character in nfa alphabet, store results in a list
+  3: List is a ('s, 'q) tuple list, which will be concatenated to the accumulator
+  4: also get any e_closures on the state, and also concatenate that list to the accumulator
+  5: After getting all the transitions on actual characters, do the epsilon transitions separately,*)
+
+  
   failwith "unimplemented"
 
 let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
