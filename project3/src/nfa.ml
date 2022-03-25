@@ -34,11 +34,13 @@ let rec contains lst item =
   match lst with
   | [] -> false
   | h::t -> if h = item then true else contains t item
-  
+
 (*union two lists together*)
-let union lst1 lst2 =
+let rec union lst1 lst2 =
   (*if lst1 already contains the head, don't cons it to lst1*)
-  fold_right (fun x a -> if contains lst1 x then a else x::a) lst1 lst2
+  match lst1 with
+  | [] -> lst2
+  | h::t -> if contains lst2 h then union t lst2 else union t (h::lst2)
 
 let rec move_helper (tr: ('q,'s) transition list) (state: 'q) (s: 's option) : 'q list =
   match s with
@@ -48,8 +50,9 @@ let rec move_helper (tr: ('q,'s) transition list) (state: 'q) (s: 's option) : '
                 | (_,_,_)::t -> move_helper t state s)
     | Some ch -> (match tr with
                   | [] -> []
-                  | (a, Some b, c)::t -> if a = state && b = ch then c::(move_helper t state s) else move_helper t state s
+                  | (a, Some b, c)::t -> if a = state && ch = b then c::(move_helper t state s) else move_helper t state s
                   | (_,_,_)::t -> move_helper t state s)
+                  
 
 
 
@@ -61,19 +64,21 @@ let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
   (*move_helper returns a list of final states reachable with a
   transition from a given state on a character
   fold right on the list move_helper returns*)
-  fold_right (fun h acc -> union acc (move_helper transitions h s) ) qs []
+  fold_right (fun h a -> union (move_helper transitions h s) a) qs []
   
   
+
+(*this function takes an nfa, a list of states, returns a list of states that can be reached w/ 0 or more
+epsilon transitions*)
+let rec e_closure_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
+  
+  match qs with
+    | [] -> []
+    | h::t -> e_closure_helper nfa (union qs (move nfa qs None))
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
-  let transitions = nfa.delta in
-  
-  let output = fold_right (fun x acc -> match x with
-                  | (a,b,c) -> a::acc) transitions [] in
-  
-  let e_transitions = move nfa qs None in
 
-  union output e_transitions
+  e_closure_helper nfa qs
   
 (*this function calls move repeatedly with a nfa and string, returning a list of states 
 the nfa could be in after the string is empty*)
@@ -128,7 +133,7 @@ match sigma with
 let rec new_states_helper (nfa: ('q,'s) nfa_t) (states: 'q list) (sigma: 's list) (acc: 'q list list): 'q list list=
   match states with
   | [] -> acc
-  | h::t -> concat acc (get_character_transitions nfa sigma h)
+  | h::t -> union acc (get_character_transitions nfa sigma h)
 
 let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   
@@ -160,13 +165,24 @@ let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list
   2: For each state, call move on it and every character in nfa alphabet, store results in a list
   3: List is a ('s, 'q) tuple list, which will be concatenated to the accumulator
   4: also get any e_closures on the state, and also concatenate that list to the accumulator
-  5: After getting all the transitions on actual characters, do the epsilon transitions separately,*)
+  5: After getting all the transitions on actual characters, do the epsilon transitions separately*)
+  let transitions = map (fun (a, b) -> (qs,a, b)) (new_trans_helper nfa qs) in
+  (*Now, get all the e_transitions*)
+  fold_right (fun x acc-> if contains nfa.qs x then (qs, None, [x])::acc else acc) qs transitions
 
-  
-  failwith "unimplemented"
+let rec new_finals_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : bool =
+  let final = nfa.fs in
+  match qs with
+  | [] -> false
+  | h::t -> if contains final h then true else new_finals_helper nfa t
 
 let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
-  failwith "unimplemented"
+  (*get list of final states from nfa
+  recurse thru qs, if nfa. fs contains a state, return qs, else return empty list*)
+    if new_finals_helper nfa qs then 
+      [qs] 
+    else 
+      []
 
 let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t =
