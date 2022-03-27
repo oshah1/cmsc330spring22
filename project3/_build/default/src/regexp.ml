@@ -1,6 +1,6 @@
 open List
 open Nfa
-
+open Sets
 (*********)
 (* Types *)
 (*********)
@@ -26,8 +26,56 @@ let fresh =
 (* Part 3: Regular Expressions *)
 (*******************************)
 
+(*creates a set of e_transitions to add to the nfa created by regexp_to_nfa*)
+let rec create_e_transitions (fin_states: 'q list) (start: 'q): ('q, 's) transition list =
+match fin_states with
+| [] -> []
+| h::t -> (h, None, start)::(create_e_transitions t start)
+
+let rec regexp_to_nfa_helper (regexp: regexp_t) : (int, char) nfa_t =
+match regexp with
+  | Empty_String -> let start_state = fresh () in {sigma = []; qs =[start_state]; q0 = start_state; fs=[start_state];
+                            delta = []}
+  | Char c -> let start = fresh () and finish = fresh () in let nfa ={sigma = [c];
+                                                                      qs = [start;finish];
+                                                                      q0 = start;
+                                                                      fs = [finish];
+                                                                      delta = [(start, Some c, finish)]} in
+                                                                      nfa
+  | Concat (r1, r2) -> let r1_nfa = regexp_to_nfa_helper r1 and r2_nfa = regexp_to_nfa_helper r2 in
+                          (*create new nfa*)
+                          {
+                            sigma = union r1_nfa.sigma r2_nfa.sigma;(*union both regexp languages*)
+                            qs = union r1_nfa.qs r2_nfa.qs;(*and set of states*)
+                            q0 = r1_nfa.q0;
+                            fs = r2_nfa.fs;
+                            delta = union r1_nfa.delta (union r2_nfa.delta (create_e_transitions r1_nfa.fs r2_nfa.q0))
+                          }
+  | Union (r1,r2) -> let r1_nfa = regexp_to_nfa_helper r1 and r2_nfa = regexp_to_nfa_helper r2 
+                      and new_start = fresh () and new_finish = fresh () in
+                      let r1_r2_deltas = union r1_nfa.delta r2_nfa.delta 
+                      and finals = union (create_e_transitions r1_nfa.fs new_finish) (create_e_transitions r2_nfa.fs new_finish) in
+                      {
+                        sigma = union r1_nfa.sigma r2_nfa.sigma;
+                        qs = union [new_start;new_finish] (union r1_nfa.qs r2_nfa.qs);
+                        q0 = new_start;
+                        fs = [new_finish];
+                        delta = union [(new_start, None, r1_nfa.q0);(new_start, None, r2_nfa.q0)] (union r1_r2_deltas finals)
+                      }
+  | Star reg -> let start = fresh () and fin = fresh () and reg_nfa = regexp_to_nfa_helper reg in
+                  {
+                    sigma = reg_nfa.sigma;
+                    qs = union reg_nfa.qs [start;fin];
+                    q0 = start;
+                    fs = [fin];
+                    delta = union reg_nfa.delta (union (create_e_transitions reg_nfa.fs fin) [(start, None, reg_nfa.q0);(start, None, fin);(fin,None, start)])
+                  }
+  
+
 let regexp_to_nfa (regexp: regexp_t) : (int, char) nfa_t =
-  failwith "unimplemented"
+  (*create new nfa*)
+  
+  regexp_to_nfa_helper regexp
 
 (*****************************************************************)
 (* Below this point is parser code that YOU DO NOT NEED TO TOUCH *)

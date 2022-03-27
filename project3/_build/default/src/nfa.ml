@@ -30,17 +30,6 @@ let explode (s: string) : char list =
 (* Part 1: NFAs *)
 (****************)
 
-let rec contains lst item =
-  match lst with
-  | [] -> false
-  | h::t -> if h = item then true else contains t item
-
-(*union two lists together*)
-let rec union lst1 lst2 =
-  (*if lst1 already contains the head, don't cons it to lst1*)
-  match lst1 with
-  | [] -> lst2
-  | h::t -> if contains lst2 h then union t lst2 else union t (h::lst2)
 
 let rec move_helper (tr: ('q,'s) transition list) (state: 'q) (s: 's option) : 'q list =
   match s with
@@ -95,7 +84,7 @@ match s with
 let rec end_in_final (states: 'q list) (final_states: 'q list): bool=
 match states with
 | [] -> false
-| h::t -> if contains final_states h then true else end_in_final t final_states
+| h::t -> if elem h final_states then true else end_in_final t final_states
 
 let accept (nfa: ('q, 's) nfa_t) (s: string) : bool =
   let string_arr = explode s in
@@ -118,63 +107,46 @@ let rec concat lst1 lst2 =
   | h::t -> concat t (h::lst2)
 
 
-(*returns a list of all transitions possible from a given state with all letters in an nfa's alphabet*)
-let rec get_character_transitions (nfa: ('q,'s) nfa_t) (sigma: 's list) (state: 'q) : 'q list list =
-let transitions c = move nfa [state] (Some c) in
-let epsilon c= e_closure nfa (transitions c) in
-let all_transitions c = union (transitions c) (epsilon c) in
-
-match sigma with
-| [] -> []
-| h::t -> (all_transitions h)::(get_character_transitions nfa t state)
-
   (*gets all the character transitions possible on a single state (incl epsilon transitions) and concatenates them
   to an accumulator*)
-let rec new_states_helper (nfa: ('q,'s) nfa_t) (states: 'q list) (sigma: 's list) (acc: 'q list list): 'q list list=
-  match states with
-  | [] -> acc
-  | h::t -> union acc (get_character_transitions nfa sigma h)
+let rec new_states_helper (nfa: ('q,'s) nfa_t) (sigma: 's list) (states: 'q list) (acc: 'q list list): 'q list list=
+  (*performs move with all given states on one character
+  Union that list with an e_closure*)
+  let move_result (ch: 's) =
+    move nfa states (Some ch) in
+  
+  match sigma with
+  [] -> acc
+  | h::t -> let all_transitions =  union (move_result h) (e_closure nfa (move_result h)) in
+  new_states_helper nfa t states (insert all_transitions acc)
+  
 
 let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   
   (*get the alphabet we will be using for getting the sets of states*)
-  new_states_helper nfa qs nfa.sigma []
+  new_states_helper nfa nfa.sigma qs  []
 
 
-
-let rec new_trans_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('a * 'b) list =
-  let sigma = nfa.sigma in
-match qs with
-| [] -> []
-| h::t -> let ch_transitions = fold_right (fun x a-> (Some x, move nfa [h] (Some x))::a) sigma [] in
-      if contains nfa.qs h then
-        (*now, add any e_transitions*)
-        let add_epsilon = map (fun (x, y) -> (x, union y (e_closure nfa y))) ch_transitions in
-        concat add_epsilon (new_trans_helper nfa t)
-      else
-        concat ch_transitions (new_trans_helper nfa t)
-
+(*takes an nfa, a list of states, and a character, performes a move on the given states, stores the result,
+performs and e_closure on the result, and returns it*)
+let rec new_trans_helper (nfa: ('q,'s) nfa_t) (letter: 's) (qs: 'q list) : 'q list =
+  let possible_transitions =
+    move nfa qs (Some letter) in
+  insert_all (e_closure nfa possible_transitions) possible_transitions
 
 
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
-  (*must return: list of q list, s transitions
-  How to construct: ([transition list], char, end state)
-  1: Send list of states to a recursive function
-  - Function will take list of states, a list of characters, and and accumulator and
-  return a list of q list s transitions
-  2: For each state, call move on it and every character in nfa alphabet, store results in a list
-  3: List is a ('s, 'q) tuple list, which will be concatenated to the accumulator
-  4: also get any e_closures on the state, and also concatenate that list to the accumulator
-  5: After getting all the transitions on actual characters, do the epsilon transitions separately*)
-  let transitions = map (fun (a, b) -> (qs,a, b)) (new_trans_helper nfa qs) in
-  (*Now, get all the e_transitions*)
-  fold_right (fun x acc-> if contains nfa.qs x then (qs, None, [x])::acc else acc) qs transitions
+  
+  (*fold thru all letters in the nfa's alphabet, calling new_trans_helper on them*)
+  let alphabet = nfa.sigma in
+  map (fun c -> (qs, Some c, (new_trans_helper nfa c qs))) alphabet
+  
 
 let rec new_finals_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : bool =
   let final = nfa.fs in
   match qs with
   | [] -> false
-  | h::t -> if contains final h then true else new_finals_helper nfa t
+  | h::t -> if elem h final then true else new_finals_helper nfa t
 
 let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   (*get list of final states from nfa
@@ -186,7 +158,28 @@ let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
 
 let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t =
-  failwith "unimplemented"
+      match work with
+      [] -> dfa
+      | h::t -> let moves = new_states nfa h in
+              let transitions = new_trans nfa h in
+              let new_work = remove h (union moves work) in
+              let new_dfa = {
+                sigma = dfa.sigma;
+                qs = union moves dfa.qs;
+                q0 = dfa.q0;
+                fs = union dfa.fs (new_finals nfa h);(*if r has a state(s) that exist(s) in nfa.fs, add them to Fd*)
+                delta = union dfa.delta transitions
+              } in nfa_to_dfa_step nfa new_dfa new_work
+
 
 let nfa_to_dfa (nfa: ('q,'s) nfa_t) : ('q list, 's) nfa_t =
-  failwith "unimplemented"
+  (*get e_closure on nfa star states, add it to worklist*)
+  let start = e_closure nfa [nfa.q0] in
+  let dfa = 
+  {
+    sigma = nfa.sigma;
+    qs = new_states nfa start;
+    q0 = start;
+    fs = [];
+    delta = new_trans nfa start
+  } in nfa_to_dfa_step nfa dfa [start]
