@@ -1,1 +1,12 @@
-2022-03-27T13:07:47+00:00 DESKTOP-HKRIS4L#01 I: Start test public:0:nfa_accept.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Start test public:0:nfa_accept.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Test public:0:nfa_accept is successful.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: End test public:0:nfa_accept.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Start test public:4:re_to_nfa.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Test public:4:re_to_nfa is successful.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: End test public:4:re_to_nfa.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Start test public:5:str_to_nfa.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Test public:5:str_to_nfa is successful.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: End test public:5:str_to_nfa.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Start test public:8:nfa_new_finals.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: Test public:8:nfa_new_finals is successful.
+2022-03-27T15:55:09+00:00 DESKTOP-HKRIS4L#01 I: End test public:8:nfa_new_finals.

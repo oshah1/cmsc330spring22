@@ -59,15 +59,18 @@ let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
 
 (*this function takes an nfa, a list of states, returns a list of states that can be reached w/ 0 or more
 epsilon transitions*)
-let rec e_closure_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
-  let e_transitions = move nfa qs None in
-  match qs with
-    | [] -> []
-    | h::t -> 
+let rec e_closure_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) (output: 'q list): 'q list =
+  if eq output qs then (*no new states*)
+    output
+  else
+    (*let R = output
+    Let output = R union (move nfa R None)*)
+    e_closure_helper nfa output (union output (move nfa output None))
+  
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
 
-  e_closure_helper nfa qs
+  e_closure_helper nfa qs (union qs (move nfa qs None))
   
 (*this function calls move repeatedly with a nfa and string, returning a list of states 
 the nfa could be in after the string is empty*)
@@ -76,27 +79,15 @@ let rec accept_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: char list) : 'q lis
 (*perform move on list of states and first character of s*)
 match s with
 [] -> e_closure nfa qs
-| h::t -> let transition_states = union (e_closure nfa qs) (move nfa qs (Some h)) in
-              accept_helper nfa transition_states t 
-
-(*recurse thru list of states returned by nfa_helper, checking if any of them are one of
-    the nfa's final states*)
-let rec end_in_final (states: 'q list) (final_states: 'q list): bool=
-match states with
-| [] -> false
-| h::t -> if elem h final_states then true else end_in_final t final_states
+| h::t -> (*perform an e_closure on qs, then move on the states returned*) let states_to_check = e_closure nfa qs in
+        accept_helper nfa (move nfa states_to_check (Some h)) t
 
 let accept (nfa: ('q, 's) nfa_t) (s: string) : bool =
   let string_arr = explode s in
-  let nfa_final = nfa.fs in
-  let nfa_start = nfa.qs in
   
-  let end_states = accept_helper nfa nfa_start string_arr in 
-  
-  
-  end_in_final end_states nfa_final
-  
-
+  let end_states = accept_helper nfa [nfa.q0] string_arr in 
+  (*check if there is no overlap b/w nfa.fs and end_states. if there isn't, don't accept the string*)
+eq (intersection nfa.fs end_states) [] = false
 (*******************************)
 (* Part 2: Subset Construction *)
 (*******************************)
@@ -123,16 +114,17 @@ let rec new_states_helper (nfa: ('q,'s) nfa_t) (sigma: 's list) (states: 'q list
 
 let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   
+  
   (*get the alphabet we will be using for getting the sets of states*)
-  new_states_helper nfa nfa.sigma qs  []
+  List.fold_right (fun x a -> (e_closure nfa (move nfa qs (Some x)))::a) nfa.sigma []
 
 
 (*takes an nfa, a list of states, and a character, performes a move on the given states, stores the result,
 performs and e_closure on the result, and returns it*)
-let rec new_trans_helper (nfa: ('q,'s) nfa_t) (letter: 's) (qs: 'q list) : 'q list =
+let new_trans_helper (nfa: ('q,'s) nfa_t) (letter: 's) (qs: 'q list) : 'q list =
   let possible_transitions =
     move nfa qs (Some letter) in
-  insert_all (e_closure nfa possible_transitions) possible_transitions
+  insert_all possible_transitions (e_closure nfa possible_transitions)
 
 
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
@@ -160,26 +152,25 @@ let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t =
       match work with
       [] -> dfa
-      | h::t -> let moves = new_states nfa h in
-              let transitions = new_trans nfa h in
-              let new_work = remove h (union moves work) in
+      | h::t -> let moves = new_states nfa h in (*calculate all states reachable from h*)
+              let transitions = new_trans nfa h in (*may have duplicates*)
+              let new_work = union moves t in (*add unvisited states to work*)
               let new_dfa = {
                 sigma = dfa.sigma;
                 qs = union moves dfa.qs;
                 q0 = dfa.q0;
                 fs = union dfa.fs (new_finals nfa h);(*if r has a state(s) that exist(s) in nfa.fs, add them to Fd*)
                 delta = union dfa.delta transitions
-              } in nfa_to_dfa_step nfa new_dfa new_work
+              } in nfa_to_dfa_step nfa new_dfa (minus new_work dfa.qs)
 
 
 let nfa_to_dfa (nfa: ('q,'s) nfa_t) : ('q list, 's) nfa_t =
   (*get e_closure on nfa star states, add it to worklist*)
-  let start = e_closure nfa [nfa.q0] in
-  let dfa = 
-  {
+  let start = e_closure nfa [nfa.q0]
+   in nfa_to_dfa_step nfa {
     sigma = nfa.sigma;
-    qs = new_states nfa start;
+    qs = [start];
     q0 = start;
     fs = [];
-    delta = new_trans nfa start
-  } in nfa_to_dfa_step nfa dfa [start]
+    delta = []
+  } [start]

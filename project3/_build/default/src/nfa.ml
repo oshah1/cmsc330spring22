@@ -63,7 +63,7 @@ let rec e_closure_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
   
   match qs with
     | [] -> []
-    | h::t -> e_closure_helper nfa (union qs (move nfa qs None))
+    | h::t -> insert_all (h::(move nfa [h] None)) (e_closure_helper nfa t)
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
 
@@ -76,27 +76,15 @@ let rec accept_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: char list) : 'q lis
 (*perform move on list of states and first character of s*)
 match s with
 [] -> e_closure nfa qs
-| h::t -> let transition_states = union (e_closure nfa qs) (move nfa qs (Some h)) in
-              accept_helper nfa transition_states t 
-
-(*recurse thru list of states returned by nfa_helper, checking if any of them are one of
-    the nfa's final states*)
-let rec end_in_final (states: 'q list) (final_states: 'q list): bool=
-match states with
-| [] -> false
-| h::t -> if elem h final_states then true else end_in_final t final_states
+| h::t -> (*perform an e_closure on qs, then move on the states returned*) let states_to_check = e_closure nfa qs in
+        accept_helper nfa (move nfa states_to_check (Some h)) t
 
 let accept (nfa: ('q, 's) nfa_t) (s: string) : bool =
   let string_arr = explode s in
-  let nfa_final = nfa.fs in
-  let nfa_start = nfa.qs in
   
-  let end_states = accept_helper nfa nfa_start string_arr in 
-  
-  
-  end_in_final end_states nfa_final
-  
-
+  let end_states = accept_helper nfa [nfa.q0] string_arr in 
+  (*check if there is no overlap b/w nfa.fs and end_states. if there isn't, don't accept the string*)
+eq (intersection nfa.fs end_states) [] = false
 (*******************************)
 (* Part 2: Subset Construction *)
 (*******************************)
