@@ -96,27 +96,13 @@ let rec concat lst1 lst2 =
   match lst1 with
   [] -> lst2
   | h::t -> concat t (h::lst2)
-
-
-  (*gets all the character transitions possible on a single state (incl epsilon transitions) and concatenates them
-  to an accumulator*)
-let rec new_states_helper (nfa: ('q,'s) nfa_t) (sigma: 's list) (states: 'q list) (acc: 'q list list): 'q list list=
-  (*performs move with all given states on one character
-  Union that list with an e_closure*)
-  let move_result (ch: 's) =
-    move nfa states (Some ch) in
-  
-  match sigma with
-  [] -> acc
-  | h::t -> let all_transitions =  union (move_result h) (e_closure nfa (move_result h)) in
-  new_states_helper nfa t states (insert all_transitions acc)
   
 
 let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   
   
   (*get the alphabet we will be using for getting the sets of states*)
-  List.fold_right (fun x a -> (e_closure nfa (move nfa qs (Some x)))::a) nfa.sigma []
+  List.fold_right (fun x a -> union (e_closure nfa (move nfa qs (Some x))) a) nfa.sigma []
 
 
 (*takes an nfa, a list of states, and a character, performes a move on the given states, stores the result,

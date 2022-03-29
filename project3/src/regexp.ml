@@ -55,7 +55,7 @@ match regexp with
                         qs = start::(fin::(union r1_nfa.qs r2_nfa.qs));
                         q0 = start;
                         fs = [fin];
-                        delta = (start, None, r1_nfa.q0)::((start,None,r2_nfa.q0)::(union r1_nfa.delta (union r2_nfa.delta finals)))
+                        delta = union ((start,None,r1_nfa.q0)::((start,None,r2_nfa.q0)::r1_nfa.delta)) (union r2_nfa.delta finals)
                       }
   | Star reg ->  let reg_nfa = regexp_to_nfa_helper reg in
                   {
@@ -63,8 +63,9 @@ match regexp with
                     qs = start::(fin::reg_nfa.qs);
                     q0 = start;
                     fs = [fin];
-                    delta = 
+                    delta = union ((start,None,reg_nfa.q0)::((start,None,fin)::((fin,None,start))::reg_nfa.delta)) (create_e_transitions reg_nfa.fs fin)
                   }
+  (*| _ -> {sigma = []; qs = [start;fin]; q0 = start; fs = [fin]; delta=[]}*)
   
 
 let regexp_to_nfa (regexp: regexp_t) : (int, char) nfa_t =
