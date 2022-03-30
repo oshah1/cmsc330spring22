@@ -72,22 +72,22 @@ let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
 
   e_closure_helper nfa qs (union qs (move nfa qs None))
   
-(*this function calls move repeatedly with a nfa and string, returning a list of states 
-the nfa could be in after the string is empty*)
+(*this function takes in an nfa a list of strings and the set of states
+the nfa could currently be in*)
 let rec accept_helper (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: char list) : 'q list = 
 
 (*perform move on list of states and first character of s*)
 match s with
 [] -> e_closure nfa qs
-| h::t -> (*perform an e_closure on qs, then move on the states returned*) let states_to_check = e_closure nfa qs in
-        accept_helper nfa (move nfa states_to_check (Some h)) t
+| h::t -> (*perform an e_closure on qs, then move on the states returned*)
+       accept_helper nfa (e_closure nfa (move nfa qs (Some h))) t
 
 let accept (nfa: ('q, 's) nfa_t) (s: string) : bool =
   let string_arr = explode s in
   
-  let end_states = accept_helper nfa [nfa.q0] string_arr in 
+  let end_states = accept_helper nfa (e_closure nfa [nfa.q0]) string_arr in 
   (*check if there is no overlap b/w nfa.fs and end_states. if there isn't, don't accept the string*)
-eq (intersection nfa.fs end_states) [] = false
+subset nfa.fs end_states
 (*******************************)
 (* Part 2: Subset Construction *)
 (*******************************)
@@ -102,7 +102,7 @@ let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   
   
   (*get the alphabet we will be using for getting the sets of states*)
-  List.fold_right (fun x a -> union (e_closure nfa (move nfa qs (Some x))) a) nfa.sigma []
+  List.fold_right (fun x a -> insert (e_closure nfa (move nfa qs (Some x))) a) nfa.sigma []
 
 
 (*takes an nfa, a list of states, and a character, performes a move on the given states, stores the result,
@@ -137,15 +137,19 @@ let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
 let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t =
       match work with
-      [] -> dfa
-      | h::t -> let moves = new_states nfa h in (*calculate all states reachable from h*)
+      [] -> {sigma = dfa.sigma;
+      qs = dfa.qs; q0 = dfa.q0;
+       fs = List.fold_right (fun x a -> if subset nfa.fs x then insert x a else a) dfa.qs []; 
+       delta = dfa.delta}
+      | h::t -> let moves = minus (new_states nfa h) [[]] in (*calculate all states reachable from h
+      but remove the empty list*)
               let transitions = new_trans nfa h in (*may have duplicates*)
-              let new_work = union moves t in (*add unvisited states to work*)
+              let new_work = insert_all moves t in (*add unvisited states to work*)
               let new_dfa = {
                 sigma = dfa.sigma;
-                qs = union moves dfa.qs;
+                qs = insert_all moves dfa.qs;
                 q0 = dfa.q0;
-                fs = union dfa.fs (new_finals nfa h);(*if r has a state(s) that exist(s) in nfa.fs, add them to Fd*)
+                fs = [];(*if r has a state(s) that exist(s) in nfa.fs, add them to Fd*)
                 delta = union dfa.delta transitions
               } in nfa_to_dfa_step nfa new_dfa (minus new_work dfa.qs)
 
@@ -159,4 +163,4 @@ let nfa_to_dfa (nfa: ('q,'s) nfa_t) : ('q list, 's) nfa_t =
     q0 = start;
     fs = [];
     delta = []
-  } [start]
+  } [start] 
