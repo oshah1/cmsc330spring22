@@ -87,7 +87,9 @@ let accept (nfa: ('q, 's) nfa_t) (s: string) : bool =
   
   let end_states = accept_helper nfa (e_closure nfa [nfa.q0]) string_arr in 
   (*check if there is no overlap b/w nfa.fs and end_states. if there isn't, don't accept the string*)
-subset nfa.fs end_states
+ match intersection end_states nfa.fs with
+  | [] -> false
+  | _ -> true
 (*******************************)
 (* Part 2: Subset Construction *)
 (*******************************)
@@ -139,7 +141,7 @@ let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
       match work with
       [] -> {sigma = dfa.sigma;
       qs = dfa.qs; q0 = dfa.q0;
-       fs = List.fold_right (fun x a -> if subset nfa.fs x then insert x a else a) dfa.qs []; 
+       fs = List.fold_right (fun x a -> if (eq (intersection nfa.fs x)) [] then a else insert x a) dfa.qs []; 
        delta = dfa.delta}
       | h::t -> let moves = minus (new_states nfa h) [[]] in (*calculate all states reachable from h
       but remove the empty list*)
