@@ -34,7 +34,8 @@ let rec lookahead_many (toks: token list) (n: int) =
 
 (* Part 2: Parsing expressions *)
 
-let rec parse_expr toks = failwith "unimplemented"
+let rec parse_expr toks = 
+  
 
 (* Part 3: Parsing mutop *)
 
