@@ -105,8 +105,8 @@ let tokenize input =
 
       else if (Str.string_partial_match (Str.regexp "\\(-[0-9]+\\)") input pos) then
         let token = Str.matched_string input in
-        let value = String.sub token 0 ((String.length token) -1) in
-        (Tok_Int value)::(tok (pos + String.length token))
+        let value = String.sub token 1 ((String.length token) -1) in
+        (Tok_Int (int_of_string value))::(tok (pos + String.length token))
 
       else if (Str.string_match (Str.regexp "[ \n\r\x0c\t]*<>[ \n\r\x0c\t]*") input pos) then
         (Tok_NotEqual)::(tok (pos+(String.length (Str.matched_string input))))
