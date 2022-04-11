@@ -32,9 +32,6 @@ let rec lookahead_many (toks: token list) (n: int) =
   | _::t, n when n > 0 -> lookahead_many t (n-1)
   | _ -> None
 
-  (* Part 3: Parsing mutop *)
-
-let rec parse_mutop toks = failwith "unimplemented"
 
 (* Part 2: Parsing expressions *)
 
@@ -55,17 +52,15 @@ and parse_exp toks =
 
   | None -> raise (InvalidInputException "S")
 
-and parse_let toks =
-  match lookahead toks with
-  let tok2 = match_token toks Tok_Let in
-      let (recurse,tok3) = match lookahead tok2 with
-                  | Some Tok_Rec -> (true,match_token tok2 Tok_Rec)
-                  | _ -> (false,tok2) in
-                  match (lookahead tok3), (lookahead_many tok3 1) with
-                  | Some Tok_ID i, Some Tok_Equal -> let tok = match_many tok3 [Tok_ID i;Tok_Equal] in
-                                                    let (tok4, exp) = parse_exp tok in
-                                                    let (tok5, exp2) = parse_exp (match_token tok4 Tok_In) in
-                                                    (tok5, Let (i,recurse,exp1,exp2))
+and parse_let toks =(*Check if the we do recursion. If so, consume the "rec" token*)
+      let (recurse,tok2) = match lookahead toks with 
+                  | Some Tok_Rec -> (true,match_token toks Tok_Rec)
+                  | _ -> (false,toks) in
+                  match (lookahead tok2), (lookahead_many tok2 1) with
+                  | Some Tok_ID i, Some Tok_Equal -> let tok3 = match_many tok2 [Tok_ID i;Tok_Equal] in
+                                                    let (tok3, exp) = parse_exp tok in
+                                                    let (tok4, exp2) = parse_exp (match_token tok4 Tok_In) in
+                                                    (tok4, Let (i,recurse,exp1,exp2))
                   | _,_ ->  raise (InvalidInputException "Let")
   
 
@@ -77,14 +72,14 @@ match lookahead toks with
 | _ -> raise (InvalidInputException "S")
 
 and parse_if toks =
-match lookahead toks with
-| Some Tok_If -> let (tok1, exp1) = parse_exp toks in
-                let tok2 = match_token tok1 Tok_Then in
-                let (tok3, exp2) = parse_exp tok2 in
-                let tok4 = match_token tok3 Tok_Else in
-                let (tok5, exp3) = parse_exp tok4 in
-                (tok5, If (exp1, exp2, exp3))
-| _ -> raise (InvalidInputException "S")
+
+  let (tok1, exp1) = parse_exp toks in
+  let tok2 = match_token tok1 Tok_Then in
+  let (tok3, exp2) = parse_exp tok2 in
+  let tok4 = match_token tok3 Tok_Else in
+  let (tok5, exp3) = parse_exp tok4 in
+  (tok5, If (exp1, exp2, exp3))
+
 
 and parse_or toks = 
 
@@ -177,7 +172,6 @@ match lookahead tok1 with
                                                                                                           (tok2, FunctionCall (exp1, exp2))
     | _ -> (tok1, exp1)
 
-
 and parse_primary toks =
 match lookahead toks with
 | Some Tok_Int i -> let tok2 = match_token toks (Tok_Int i) in
@@ -197,3 +191,6 @@ match lookahead toks with
 | _ -> raise (InvalidInputException "S")
 
 
+  (* Part 3: Parsing mutop *)
+
+  let rec parse_mutop toks = failwith "unimplemented"
