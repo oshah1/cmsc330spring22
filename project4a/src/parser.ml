@@ -37,40 +37,40 @@ let rec lookahead_many (toks: token list) (n: int) =
 
 let rec parse_expr toks =
   let (t, exp) = parse_exp toks in
-  if t <> Tok_DoubleSemi then
-    raise (InvalidInputException "s")
-  else
-    exp
-
+    (t, exp)
+ 
 and parse_exp toks =
-  match lookahead toks with
+
+match lookahead toks with
   | Some Tok_Let -> let tok2 = match_token toks Tok_Let in parse_let tok2
-
+  
   | Some Tok_Fun -> let tok2 = match_token toks Tok_Fun in parse_fun tok2
-  | Some Tok_If -> let tok2 = match_token toks Tok_if in parse_if tok2          
-  | Some _ ->  parse_or toks
-
-  | None -> raise (InvalidInputException "S")
-
-and parse_let toks =(*Check if the we do recursion. If so, consume the "rec" token*)
-      let (recurse,tok2) = match lookahead toks with 
-                  | Some Tok_Rec -> (true,match_token toks Tok_Rec)
-                  | _ -> (false,toks) in
-                  match (lookahead tok2), (lookahead_many tok2 1) with
-                  | Some Tok_ID i, Some Tok_Equal -> let tok3 = match_many tok2 [Tok_ID i;Tok_Equal] in
-                                                    let (tok3, exp) = parse_exp tok in
-                                                    let (tok4, exp2) = parse_exp (match_token tok4 Tok_In) in
-                                                    (tok4, Let (i,recurse,exp1,exp2))
-                  | _,_ ->  raise (InvalidInputException "Let")
+  | Some Tok_If -> let tok2 = match_token toks Tok_If in parse_if tok2          
+  | _ -> parse_or toks
   
 
+
+  and parse_let toks =(*Check if the we do recursion. If so, consume the "rec" token*)
+
+    let recurse,tok1 = match lookahead toks with 
+    | Some Tok_Rec -> true,match_token toks Tok_Rec
+    | _ -> false,toks in
+    match (lookahead tok1), (lookahead_many tok1 1) with
+    | Some Tok_ID i, Some Tok_Equal -> let tok2 = match_many tok1 [Tok_ID i;Tok_Equal] in
+                                      let (tok3, exp) = parse_exp tok2 in
+                                      let (tok4, exp2) = parse_exp (match_token tok3 Tok_In) in
+                                      
+                                      (tok4, Let (i,recurse,exp,exp2))
+    | _ , _ ->  raise (InvalidInputException "Let")
+
+
 and parse_fun toks =
-match lookahead toks with
-| Some Tok_ID id -> let tok2 = match_many toks [Tok_ID id;Tok_Arrow] in
+  match lookahead toks with
+  | Some Tok_ID id -> let tok2 = match_many toks [Tok_ID id;Tok_Arrow] in
                     let (tok3, exp) = parse_exp tok2 in
                     (tok3, Fun (id, exp))
-| _ -> raise (InvalidInputException "S")
-
+  | _ -> raise (InvalidInputException "S")
+  
 and parse_if toks =
 
   let (tok1, exp1) = parse_exp toks in
@@ -79,118 +79,149 @@ and parse_if toks =
   let tok4 = match_token tok3 Tok_Else in
   let (tok5, exp3) = parse_exp tok4 in
   (tok5, If (exp1, exp2, exp3))
-
+  
 
 and parse_or toks = 
 
 let (tok1, exp1) = parse_and toks in
-match lookahead toks with
-| Some Tok_Or -> let tok2 = match_token tok1 Tok_Or in
+match lookahead tok1 with
+  | Some Tok_Or -> let tok2 = match_token tok1 Tok_Or in
+  
               let (tok3, exp2) = parse_or tok2 in
               (tok3, Binop (Or, exp1, exp2))
-| _ -> (tok1, exp1)
+  | _ -> tok1, exp1
+  
 
 and parse_and toks = 
-let (tok1, exp1) = parse_equal toks in
-match lookahead tok1 with
-| Some Tok_And -> let tok2 = match_token tok1 Tok_And in
-let (tok3, exp2) = parse_and tok2 in
-(tok3, Binop (And, exp1, exp2))
-| _ -> (tok1, exp1)
 
-and parse_equal toks =
-  let (tok1, exp1) = parse_relate toks in
+  let (tok1, exp1) = parse_equality toks in
   match lookahead tok1 with
-  | Some Tok_Equal -> let tok2 = match_token tok1 Tok_Equal in
-                  let (tok3, exp2) = parse_equal tok2 in
-                  (tok3, Binop (Equal, exp1, exp1))
-  | Some Tok_NotEqual -> let tok2 = match_token tok1 Tok_NotEqual in
-                    let (tok3, exp2) = parse_equal tok2 in
-                    (tok3, Binop (NotEqual, exp1, exp1))
+    | Some Tok_And -> let tok2 = match_token tok1 Tok_And in
+    let (tok3, exp2) = parse_and tok2 in
+    (tok3, Binop (And, exp1, exp2))
+    | _ -> tok1, exp1
+    
 
-and parse_relate toks = 
-  let (tok1, exp1) = parse_add tok2 in
+and parse_equality toks =
+
+let (tok1, exp1) = parse_relational toks in
+match lookahead tok1 with
+  | Some Tok_Equal -> let tok2 = match_token tok1 Tok_Equal in
+                let (tok3, exp2) = parse_equality tok2 in
+                (tok3, Binop (Equal, exp1, exp2))
+  | Some Tok_NotEqual -> let tok2 = match_token tok1 Tok_NotEqual in
+                  let (tok3, exp2) = parse_equality tok2 in
+                  (tok3, Binop (NotEqual, exp1, exp2))
+  | _ -> tok1, exp1
+
+and parse_relational toks = 
+
+let (tok1, exp1) = parse_add toks in
   match lookahead tok1 with
   | Some Tok_GreaterEqual-> let tok2 = match_token tok1 Tok_GreaterEqual in
-                                let (tok3, exp2) = parse_relate tok2 in
-                                (tok3, Binop (GreaterEqual, exp1, exp1))
+                                let (tok3, exp2) = parse_relational tok2 in
+                                (tok3, Binop (GreaterEqual, exp1, exp2))
   | Some Tok_Greater -> let tok2 = match_token tok1 Tok_Greater in
-                      let (tok3, exp2) = parse_relate tok2 in
-                      (tok3, Binop (Greater, exp1, exp1))
-  | Some Tok_LessEqual -> let tok = match_token tok1 Tok_LessEqual in
-                      let (tok3, exp2) = parse_relate tok2 in
+                      let (tok3, exp2) = parse_relational tok2 in
+                      (tok3, Binop (Greater, exp1, exp2))
+  | Some Tok_LessEqual -> let tok2 = match_token tok1 Tok_LessEqual in
+                      let (tok3, exp2) = parse_relational tok2 in
                       (tok3, Binop (LessEqual, exp1, exp2))
-  | Some Tok_Less -> let tok = match_token tok1 Tok_Less in
-                let (tok3, exp2) = parse_relate tok2 in
+  | Some Tok_Less -> let tok2 = match_token tok1 Tok_Less in
+                let (tok3, exp2) = parse_relational tok2 in
                 (tok3, Binop (Less, exp1, exp2))
-  | _ -> (tok1, exp1)
+  | _ -> tok1, exp1
 
-and parse_add toks =
-let (tok1, exp) = parse_mult toks in
-match lookahead tok1 with
-| Some Tok_Add -> let tok2 = match_token tok1 Tok_Add in
+  and parse_add toks =
+  
+  let (tok1, exp) = parse_mult toks in
+  match lookahead tok1 with
+  | Some Tok_Add -> let tok2 = match_token tok1 Tok_Add in
               let (tok3, exp2) = parse_add tok2 in
               (tok3, Binop (Add, exp, exp2))
-| Some Tok_Sub -> let tok2 = match_token tok1 Tok_Sub in
+  | Some Tok_Sub -> let tok2 = match_token tok1 Tok_Sub in
               let (tok3, exp2) = parse_add tok2 in
-              (tok3, Binop (Sub, exp, exp2))
-
-| _ -> (tok1, exp)
+              (tok3, Binop (Sub, exp, exp2))  
+  | _  -> tok1,exp
 
 and parse_mult toks =
+
 let (tok1,exp1) = parse_concat toks in
 match lookahead tok1 with
 | Some Tok_Mult -> let tok2 = match_token tok1 Tok_Mult in
-              let (tok3, exp2) = parse_mult tok2 in
-              (tok3, Binop (Mult, exp1, exp2))
-| Some Tok_Div -> let tok2 = match_token Tok_Div in
-              let (tok3, exp2) = parse_mult tok2 in
-              (tok3, Binop (Div, exp1, exp2))
+            let (tok3, exp2) = parse_mult tok2 in
+            (tok3, Binop (Mult, exp1, exp2))
+| Some Tok_Div -> let tok2 = match_token tok1 Tok_Div in
+            let (tok3, exp2) = parse_mult tok2 in
+            (tok3, Binop (Div, exp1, exp2))
 
-| _ -> (tok1, exp1)
+| _ -> tok1, exp1
+
 
 and parse_concat toks =
-let (tok1, exp) = parse_unary toks =
+
+let (tok1, exp) = parse_unary toks in
 match lookahead tok1 with
 | Some Tok_Concat -> let tok2 = match_token tok1 Tok_Concat in
-                let (tok3, exp2) = parse_concat tok2 in
-                (tok3, Binop (Concat, exp, exp2))
+              let (tok3, exp2) = parse_concat tok2 in
+              (tok3, Binop (Concat, exp, exp2))
 | _ -> (tok1,exp)
+
+
 and parse_unary toks =
+
 (*match token in front with ^*)
 match lookahead toks with
-| Some t -> let tok2 = match_token Tok_Not t in
-            let (tok3, exp) = parse_unary tok2 in
-            (tok3, exp)
-| None -> parse_primary toks
+| Some Tok_Not -> let tok2 = match_token toks Tok_Not in
+          let (tok3, exp) = parse_unary tok2 in
+          (tok3, Not exp)
+| _ -> parse_functioncall toks
 
 and parse_functioncall toks = 
 
 let (tok1, exp1) = parse_primary toks in
 match lookahead tok1 with
-    | (Some Tok_Int _) | (Some Tok_Bool _) | (Some Tok_String _) | (Some Tok_ID _) | (Some Tok_LParen) -> let (tok2, exp2) = parse_primary tok1 in
-                                                                                                          (tok2, FunctionCall (exp1, exp2))
-    | _ -> (tok1, exp1)
+  | (Some Tok_Int _) | (Some Tok_Bool _) | (Some Tok_String _) | (Some Tok_ID _) | (Some Tok_LParen) -> let (tok2, exp2) = parse_primary tok1 in
+                                                                                                        (tok2, FunctionCall (exp1, exp2))
+  | _ -> tok1, exp1
 
 and parse_primary toks =
-match lookahead toks with
-| Some Tok_Int i -> let tok2 = match_token toks (Tok_Int i) in
+
+  match lookahead toks with
+  | Some Tok_Int i -> let tok2 = match_token toks (Tok_Int i) in
             (tok2,Value (Int i))
 
-| Some Tok_Bool b -> let tok2 = match_token toks (Tok_Bool b) in
+  | Some Tok_Bool b -> let tok2 = match_token toks (Tok_Bool b) in
             (tok2, Value (Bool b))
-| Some Tok_String st -> let tok2 = match_token toks (Tok_String st) in
+
+  | Some Tok_String st -> let tok2 = match_token toks (Tok_String st) in
               (tok2, Value (String st))
-| Some Tok_ID id -> let tok2 = match_token toks (Tok_ID s) in
+  | Some Tok_ID id -> let tok2 = match_token toks (Tok_ID id) in
               (tok2, ID id)
-| Some Tok_LParen -> let tok2 = match_token toks (Tok_LParen) in
-              let (tok3, e) = parse_exp tok2 in (*parse the
-                                                  expression*)
-              let tok4 = match_token tok3 (Tok_RParen) in
+
+  | Some Tok_LParen -> let tok2 = match_token toks Tok_LParen in
+              let (tok3, e) = parse_exp tok2 in
+              let tok4 = match_token tok3 Tok_RParen in
               (tok4,e)
-| _ -> raise (InvalidInputException "S")
+  | _ -> raise (InvalidInputException "No tokens left")
 
 
-  (* Part 3: Parsing mutop *)
-
-  let rec parse_mutop toks = failwith "unimplemented"
+(* Part 3: Parsing mutop *)
+let rec parse_mutop toks = 
+  match lookahead toks with
+  | Some Tok_Def -> let t2 = match_token toks Tok_Def in
+              let (t3, e1) = parse_def t2 in
+              let t4 = match_token t3 Tok_DoubleSemi in
+              t4, e1
+  | Some Tok_DoubleSemi -> let t2= match_token toks Tok_DoubleSemi in
+                      t2, NoOp
+  | _ -> let (t2, e1) = parse_expr toks in
+          let t3 = match_token t2 Tok_DoubleSemi in
+          (t3, Expr (e1))
+  
+and parse_def toks =
+match lookahead toks, lookahead_many toks 1 with
+| Some Tok_ID id, Some Tok_Equal -> let t2 = match_many toks [Tok_ID id;Tok_Equal] in
+                                    let (t3, e1) = parse_expr t2 in (*leave double-semicolon*)
+                                    (t3,Def (id, e1))
+| _ -> raise (InvalidInputException "parse_def")
