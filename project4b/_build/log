@@ -1,10 +1,10 @@
-# dune build
+# dune runtest -f
 # OCAMLPARAM: unset
 # Workspace root: /home/fire21_oshah1/cmsc330spring22/project4b
-$ /usr/bin/nproc > /tmp/dune8fdbfe.output 2> /dev/null
+$ /usr/bin/nproc > /tmp/duned33541.output 2> /dev/null
 # Auto-detected concurrency: 8
 # disable binary cache
-$ /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -config > /tmp/duned05295.output
+$ /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -config > /tmp/dune4ebf8c.output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -114,13 +114,16 @@ $ /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -config > /tmp/duned05295.outp
 #      }
 #  }
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamldep.opt -modules -impl src/eval.ml) > _build/default/src/.p4b.objs/eval.ml.d
-$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w -40 -g -bin-annot -I src/.p4b.objs/byte -intf-suffix .ml -no-alias-deps -open P4b -o src/.p4b.objs/byte/p4b__Eval.cmo -c -impl src/eval.ml)
-$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w -40 -g -a -o src/p4b.cma src/.p4b.objs/byte/p4b.cmo src/.p4b.objs/byte/p4b__MicroCamlTypes.cmo src/.p4b.objs/byte/p4b__TokenTypes.cmo src/.p4b.objs/byte/p4b__Utils.cmo src/.p4b.objs/byte/p4b__Parser.cmo src/.p4b.objs/byte/p4b__Lexer.cmo src/.p4b.objs/byte/p4b__Eval.cmo)
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -I src/.p4b.objs/byte -I src/.p4b.objs/native -intf-suffix .ml -no-alias-deps -open P4b -o src/.p4b.objs/native/p4b__Eval.cmx -c -impl src/eval.ml)
+$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -I src/.p4b.objs/byte -I src/.p4b.objs/native -intf-suffix .ml -no-alias-deps -open P4b -o src/.p4b.objs/native/p4b__Parser.cmx -c -impl src/parser.ml)
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -a -o src/p4b.cmxa src/.p4b.objs/native/p4b.cmx src/.p4b.objs/native/p4b__MicroCamlTypes.cmx src/.p4b.objs/native/p4b__TokenTypes.cmx src/.p4b.objs/native/p4b__Utils.cmx src/.p4b.objs/native/p4b__Parser.cmx src/.p4b.objs/native/p4b__Lexer.cmx src/.p4b.objs/native/p4b__Eval.cmx)
-$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w -40 -g -o test/public/public.bc /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cma src/p4b.cma /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cma /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cma test/testUtils.cma test/public/.public.eobjs/byte/dune__exe__Public.cmo)
-$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlc.opt -w -40 -g -o test/pbt/pbt.bc /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cma src/p4b.cma /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cma /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cma /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/qcheck_core.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/runner/qcheck_runner.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-ounit/qcheck_ounit.cma /home/fire21_oshah1/.opam/4.12.0/lib/qcheck/qcheck.cma test/testUtils.cma test/pbt/.pbt.eobjs/byte/dune__exe__Pbt.cmo)
-$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -shared -linkall -I src -o src/p4b.cmxs src/p4b.cmxa)
-$ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -o bin/mutop.exe /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml src/p4b.cmxa bin/.mutop.eobjs/native/dune__exe__Mutop.cmx)
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -o test/public/public.exe /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml src/p4b.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cmxa test/testUtils.cmxa test/public/.public.eobjs/native/dune__exe__Public.cmx)
 $ (cd _build/default && /home/fire21_oshah1/.opam/4.12.0/bin/ocamlopt.opt -w -40 -g -o test/pbt/pbt.exe /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/str.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml src/p4b.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ocaml/unix.cmxa -I /home/fire21_oshah1/.opam/4.12.0/lib/ocaml /home/fire21_oshah1/.opam/4.12.0/lib/stdlib-shims/stdlib_shims.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/advanced/oUnitAdvanced.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/ounit2/oUnit.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/qcheck_core.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-core/runner/qcheck_runner.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck-ounit/qcheck_ounit.cmxa /home/fire21_oshah1/.opam/4.12.0/lib/qcheck/qcheck.cmxa test/testUtils.cmxa test/pbt/.pbt.eobjs/native/dune__exe__Pbt.cmx)
+$ (cd _build/default/test/public && ./public.exe)
+> ..............................
+> Ran: 30 tests in: 0.11 seconds.
+> OK
+$ (cd _build/default/test/pbt && ./pbt.exe)
+> ....
+> Ran: 4 tests in: 0.49 seconds.
+> OK

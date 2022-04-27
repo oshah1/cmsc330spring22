@@ -50,7 +50,7 @@ match lookahead toks with
 
   and parse_let toks =(*Check if the we do recursion. If so, consume the "rec" token*)
 
-    let recurse,tok1 = match lookahead toks with 
+    let (recurse,tok1) = match lookahead toks with 
     | Some Tok_Rec -> true,match_token toks Tok_Rec
     | _ -> false,toks in
     match (lookahead tok1), (lookahead_many tok1 1) with
@@ -60,7 +60,6 @@ match lookahead toks with
                                       
                                       (tok4, Let (i,recurse,exp,exp2))
     | _ , _ ->  raise (InvalidInputException "Let")
-
 
 and parse_fun toks =
   match lookahead toks with

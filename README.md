@@ -44,4 +44,11 @@
 * [Discussion 6 - Closures and Imperative OCaml](./discussions/d6_functions)
 * [Discussion 7 - NFAs and DFAs!](./discussions/d7_nfa_dfa)
 * [Discussion 8 - CFGs and Parsing](./discussions/d8_parsing)
+<<<<<<< HEAD
 >>>>>>> bd9992285f48c2964a6f89278438f43342e55116
+=======
+* [Discussion 10 - Operational Semantics and Parsing (cont)](./discussions/d10_eval)
+* [Discussion 11 - Lambda Calculus](./discussions/d11_lambda)
+* [Discussion 12 - Intro to Rust](./discussions/d12_intro_rust)
+* [Discussion 13 - Rust Memory](./discussions/d13_rust_memory)
+>>>>>>> 234156aed4b0ba0c3a978446bfb89f854b9a1589

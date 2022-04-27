@@ -1,0 +1,27 @@
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:0:public_nothing.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:0:public_nothing is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:0:public_nothing.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:4:public_expr_apply.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:4:public_expr_apply is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:4:public_expr_apply.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:6:public_expr_let_if.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:6:public_expr_let_if is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:6:public_expr_let_if.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:9:public_expr_nested_let.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:9:public_expr_nested_let is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:9:public_expr_nested_let.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:13:public_expr_simple_mult.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:13:public_expr_simple_mult is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:13:public_expr_simple_mult.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:17:public_expr_single_bool.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:17:public_expr_single_bool is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:17:public_expr_single_bool.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:20:public_expr_single_let.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:20:public_expr_single_let is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:20:public_expr_single_let.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:24:public_expr_single_or.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:24:public_expr_single_or is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:24:public_expr_single_or.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Start test public:27:public_mutop_factorial.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: Test public:27:public_mutop_factorial is successful.
+2022-04-24T11:04:59+00:00 DESKTOP-HKRIS4L#01 I: End test public:27:public_mutop_factorial.

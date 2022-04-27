@@ -55,61 +55,52 @@ let rec eval_expr env e =
                   match value with
                   Bool b -> Bool (b <> true)
                   | _ -> raise (TypeError "Expected type bool") end
+
   (*Handles all binary operations*)
-
-  | (Binop (Concat, x, y)) -> let x' = eval_expr env x in
-                              let y' = eval_expr env y in
-                              begin
-                              match x',y' with
-                              | String a, String b -> String (a ^ b)
-                              | _ -> raise (TypeError "Expected type string") end
-
-  | (Binop (o, x,y)) -> let x' = eval_expr env x in
-                          let y' = eval_expr env y in
-                          begin match o with
-                              | Add ->  let (a,b) = match_int x' y' in
-                                          Int (a+b)
-                              | Sub -> let (a,b) = match_int x' y' in Int (a-b)
-                              | Div -> let (a,b) = match_int x' y' in 
-                                      begin match a,b with (*check for attempt to divide by 0*)
-                                        | _,0 -> raise DivByZeroError
-                                        | _, _ -> Int (a/b) end
-
-                              | Mult -> let (a,b) = match_int x' y' in Int (a * b)
-                              | Greater -> let (a,b) = match_int x' y' in Bool (a>b)
-                              | GreaterEqual -> let (a,b) = match_int x' y' in Bool (a>=b)
-                              | Less -> let (a,b) = match_int x' y' in Bool (a<b)
-                              | LessEqual -> let (a,b) = match_int x' y' in Bool (a<=b)
-                              | Equal -> begin match x',y' with
-                                        | Int a, Int b -> Bool (a=b)
-                                        | Bool a, Bool b -> Bool (a=b)
-                                        | String a, String b -> Bool (a=b) 
-                                        | Closure (_, _, _), Closure (_, _, _) -> raise (TypeError "Cannot compare closures")
-                                        | _ , _ -> raise (TypeError "Cannot compare these types") end
-
-                                        (*Bool (a<>b)*)
-                              | NotEqual -> begin match x',y' with
-                                  | Int a, Int b -> Bool (a<>b)
-                                  | Bool a, Bool b -> Bool (a<>b)
-                                  | String a, String b -> Bool (a<>b)
-                                  | Closure (_, _, _), Closure (_, _, _) -> raise (TypeError "Cannot compare closures")
-                                  | _ , _ -> raise (TypeError "Cannot compare these types") end
-
-                              | Or -> begin match x',y' with
-                                      | Bool a, Bool b -> Bool (a||b)
-                                      | _, _ -> raise (TypeError "Expected type bool") end
-                              | And -> begin match x',y' with
-                                      | Bool a, Bool b -> Bool (a && b)
-                                      | _, _ -> raise (TypeError "Expected type bool") end
-                              | _ -> raise (TypeError "Expected type int") end
+  | (Binop (o, x,y)) -> let x1 = eval_expr env x in
+                        let y1 = eval_expr env y in
+                        begin
+                        match o with
+                        | Add -> let (a,b) = match_int x1 y1 in Int (a+b)
+                        | Sub -> let (a,b) = match_int x1 y1 in Int (a-b)
+                        | Mult -> let (a,b) = match_int x1 y1 in Int (a*b)
+                        | Div -> begin match x1, y1 with
+                                  | Int _, Int 0 -> raise DivByZeroError
+                                  | Int a, Int b -> Int (a/b)
+                                  | _ , _ -> raise (TypeError "Expected type Int") end
+                        | Greater -> let (a,b) = match_int x1 y1 in Bool (a > b)
+                        | Less -> let (a,b) = match_int x1 y1 in Bool (a < b)
+                        | GreaterEqual -> let (a,b) = match_int x1 y1 in Bool (a >= b)
+                        | LessEqual -> let (a,b) = match_int x1 y1 in Bool (a <= b)
+                        | Concat -> begin match x1, y1 with
+                                    | String a, String b -> String (a ^ b)
+                                    | _, _ -> raise (TypeError "Expected type String") end
+                        | Equal -> begin match x1, y1 with
+                                    | Int a, Int b -> Bool (a=b)
+                                    | Bool a, Bool b -> Bool (a=b)
+                                    | String a, String b -> Bool (a=b)
+                                    | Closure (_,_,_), Closure (_,_,_) -> raise (TypeError "Cannot compare Closures")
+                                    | _,_ -> raise (TypeError "Cannot compare types") end
+                        | NotEqual -> begin match x1, y1 with
+                                | Int a, Int b -> Bool (a<>b)
+                                | Bool a, Bool b -> Bool (a<>b)
+                                | String a, String b -> Bool (a<>b)
+                                | Closure (_,_,_), Closure (_,_,_) -> raise (TypeError "Cannot compare Closures")
+                                | _,_ -> raise (TypeError "Cannot compare types") end
+                        | And -> begin match x1,y1 with
+                                  | Bool a, Bool b -> Bool (a&&b)
+                                  | _, _ -> raise (TypeError "Expected type Bool") end
+                        | Or -> begin match x1,y1 with
+                                  | Bool a, Bool b -> Bool (a || b)
+                                  | _, _ -> raise (TypeError "Expected type Bool") end
+                        end
     (*evaluate guard branch and check if it evaluates to a bool*)
-  | (If (a,b,c)) -> begin let guard = eval_expr env a in
-      let tbranch = eval_expr env b in (*evaluate true branch*)
-      let fbranch = eval_expr env c in (*eval false branch*)
+  | If (a,b,c) -> begin let guard = eval_expr env a in
+    
       (*if guard evals to true, evaluate true branch, else
         evaluate false branch*)
       match guard with 
-      | Bool x -> if x then tbranch else fbranch
+      | Bool x -> if x then eval_expr env b else eval_expr env c
       | _ -> raise (TypeError "Expected type bool") end
   | (Let (name, recurse, init, body)) -> if recurse then
                                             (*create environment that maps name to a
