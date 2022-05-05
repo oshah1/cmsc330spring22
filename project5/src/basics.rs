@@ -35,11 +35,18 @@ pub fn in_range(ls: &[i32], s: i32, e: i32) -> i32 {
 pub fn subset<T: PartialEq>(set: &[T], target: &[T]) -> bool {
     let mut result = true;
     for i in target.iter() {
+        let has_elem = false;
         /*check if set contains an element in target*/
+        //if so, do nothing
+        //else, set result to false
         for j in set.iter() {
-            if i !=j {
-                result = false
+            if *i == *j {
+                has_elem = true;
             }
+
+        }
+        if !has_elem {
+            result = false
         }
     }
     result
@@ -67,13 +74,12 @@ pub fn mean(ls: &[f64]) -> Option<f64> {
     Ex: to_decimal of [1,0,1,0] returns 10
 **/
 pub fn to_decimal(ls: &[i32]) -> i32 {
-    let mut c = 0;
-    let mut xpow;
+    
+    let mut counter = 0;
     let mut result = 0;
-    for i in ls.iter() {
-        xpow = 2_i32.pow(c)
-        result =  result + (*i * xpow);
-        c = c+1;
+    for i in ls.iter.rev() {
+        let xpow = 2_i32.pow(counter);
+        result = result + (*i * xpow);
     }
     result
 }
@@ -98,23 +104,32 @@ fn is_prime (num: &u32) -> bool {
 }
 
 pub fn factorize(n: u32) -> Vec<u32> {
-    let result:Vec<u32> = Vec::new();
+    let mut result:Vec<u32> = Vec::new();
     /*Find the first number that divides 36, then factorize the divisor*/
+    let mut i = 2;
+    
     for i in 2..n {
-        
-        let d = n % i;//remainder division
-        if (d==0) && is_prime(&i) {
-            result.push(i);//push the number onto result
-            let c = n/i;
-            if c < 2 || i==n{ //in either of these cases, we don't need to find any more prime factors
-
-            } else {
-                //factorize the result of dividing n by i to get the other primes
-                let mut other_primes:Vec<u32> = factorize(c);
-                //move all elements from other_primes into
-                result.append(&mut other_primes);
-            } 
+        //check if i is prime
+        if is_prime(&i) {
+            //check if i evenly divides n
+            if n%i == 0 {
+                //save i
+                result.push(*(&i));
+                //divide n by i
+                let quot = n/i;
+                //check if quot is 1
+                if quot >= 2 {
+                    //if not, factorize the quotient
+                    let mut factors = factorize(quot);
+                    //append factors to result
+                    result.append(&mut factors);
+                }
+                //end the loop
+                break;
+            }
         }
+        
+
     }
     result
 }
@@ -127,17 +142,19 @@ pub fn factorize(n: u32) -> Vec<u32> {
     EX: rotate [1,2,3,4] returns [2,3,4,1]
 **/
 pub fn rotate(lst: &[i32]) -> Vec<i32> {
-    let first = lst[0];//get the first element
-    let length = lst.len();
-    if length >=2 {
-    for i in 0..(length -2) {
-        lst[i] = lst[i+1];
+    let mut result = Vec::new();
+    
+    
+    for i in lst.iter() {
+        result.push(*i);
     }
+    //remove the first element
+    let first = result.remove(0);
+    //push it onto the end of result
+    result.push(first);
+    result
 }
-    lst[length - 1] = first;
-    Vec::from(lst)
-}
-
+    
 /**
     Returns true if target is a subtring of s, false otherwise
     You should not use the contains function of the string library in your implementation
@@ -146,9 +163,9 @@ pub fn rotate(lst: &[i32]) -> Vec<i32> {
 **/
 pub fn substr(s: &String, target: &str) -> bool {
     let s_len = s.len();
-    let target+len = target.len();
+    let target_len = target.len();
     for i in 0..(s_len-target_len) {
-        let sl = s.slice(i);
+        let sl = &s[i..(i + target_len - 1)];
         if target == sl {
             return true
         }
@@ -165,11 +182,35 @@ pub fn substr(s: &String, target: &str) -> bool {
     EX: longest_sequence of "" is None
 **/
 pub fn longest_sequence(s: &str) -> Option<&str> {
-    let mut result = "";
+    let mut result = "";//tracks longest sequence
     let mut max_seq_len = 0;//tracks max sequence length
     let len = s.len();
-    let mut curr_seq_len = 0;//length of current sequence
-    if len = 0
-    let mut last_char = &s[];
-    for i in 0..[len - 2] {
-   
+    
+    let mut curr_seq_begins = 0;//track what index a sequence starts
+    let mut curr_seq_ends = 0;
+    if len == 0 {
+        return None;
+        } else {
+        for i in 0..(len - 1) {
+            let curr = &s[i..i];//current character
+            if result.len() == 0 {
+
+            } else {
+                //Check last character of the current sequence
+                //if it's different than the current character, we have started a new sequence
+                if &s[curr_seq_ends..curr_seq_ends] != curr {
+                    curr_seq_begins = i;//update start of current sequence
+                    
+                }
+            }
+            curr_seq_ends = i;//update end of current sequence
+            let curr_seq = &s[curr_seq_begins..curr_seq_ends];
+            if curr_seq.len() > max_seq_len {
+                result = curr_seq;
+                max_seq_len = curr_seq.len();
+            }
+        }
+    }
+
+    Some(result)
+}

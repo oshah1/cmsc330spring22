@@ -26,7 +26,7 @@ pub struct Armor {
 // Part 2
 
 // Students should fill in the Link type themselves. The Node and List types are given as is.
-type Link = ();
+type Link = Arc<RwLock<Option <Node>>>;//Must store a node, but may be empty too
 
 struct Node {
     data: Armor,
@@ -41,7 +41,8 @@ pub struct List {
 
 impl List {
     pub fn new() -> Self {
-        unimplemented!()
+        return List {head_link: Arc::new(RwLock::new(None)), size: 8}
+        
     }
 
     pub fn size(&self) -> usize {
@@ -49,15 +50,40 @@ impl List {
     }
 
     pub fn peek(&self) -> Option<Armor> {
-        unimplemented!()
+        //get a Node type
+        let head = self.head_link.deref();
+        let node = *(head.borrow());
+        match node {
+            None => None,
+            Some(n) => {let a = n.data.clone();//clone data in node
+                            return Some(a);}
+        }
+        //dereference head for pattern matching
+        
     }
 
     pub fn push(&mut self, component: Armor) {
-        unimplemented!()
+        //first, get the head link
+        let lnk = self.head_link;
+
+        //Create a new now that has the component as its data and the old head as its link
+        let node = Node {data : component, rest: lnk};
+        self.head_link = Arc::new(RwLock::new(Some (node)));
     }
 
     pub fn pop(&mut self) -> Option<Armor> {
-        unimplemented!()
+        //first, get the head link
+        let head = self.head_link;
+        //get the underlying node
+        let node = *(head.deref()).borrow_mut();
+        //pattern match
+        match node {
+            None => None,
+            Some(n) => {let output = Some (n.data);
+                        //advance head link
+                        self.head_link = Arc::clone(node.rest);
+                        return output;}
+        }
     }
 }
 
@@ -70,8 +96,28 @@ pub struct Suit {
 }
 
 impl Suit {
+    
     pub fn is_compatible(&self) -> bool {
-        unimplemented!()
+
+        fn is_compatible_aux(lst:&mut List, v:&i32) -> bool {
+            
+            //pop armor off of lst
+            let curr = lst.pop();
+            //match curr
+            match curr {
+                None => true,
+                Some (n) => {if n.version == *v {
+                        is_compatible_aux(lst,&v)
+                    } else {
+                        false
+                    }
+                }
+
+            }
+            
+        }
+        let mut armor = self.armor.clone();
+        is_compatible_aux(&mut armor,&self.version)
     }
 
     pub fn repair(&mut self) {
