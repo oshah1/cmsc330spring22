@@ -26,7 +26,7 @@ pub struct Armor {
 // Part 2
 
 // Students should fill in the Link type themselves. The Node and List types are given as is.
-type Link = Arc<RwLock<Option <Node>>>;//Must store a node, but may be empty too
+type Link = Option<Arc<RwLock<Node>>>;//Must store a node, but may be empty too
 
 struct Node {
     data: Armor,
@@ -41,7 +41,7 @@ pub struct List {
 
 impl List {
     pub fn new() -> Self {
-        return List {head_link: Arc::new(RwLock::new(None)), size: 8}
+        return List {head_link: None, size: 0}
         
     }
 
@@ -50,13 +50,16 @@ impl List {
     }
 
     pub fn peek(&self) -> Option<Armor> {
-        //get a Node type
-        let head = self.head_link.deref();
-        let node = *(head.borrow());
-        match node {
-            None => None,
-            Some(n) => {let a = n.data.clone();//clone data in node
-                            return Some(a);}
+        //borrow head
+        let head = &self.head_link;
+        match head {
+            None => return None,
+            Some(link) => {let node = (link.deref()).read().unwrap();//borrow it
+                            /*borrow_mut returns Node.
+                            get data field of node, borrow it*/
+                        let data = node.data;
+                        
+                    return Some(data);}
         }
         //dereference head for pattern matching
         
@@ -64,26 +67,33 @@ impl List {
 
     pub fn push(&mut self, component: Armor) {
         //first, get the head link
-        let lnk = self.head_link;
-
-        //Create a new now that has the component as its data and the old head as its link
-        let node = Node {data : component, rest: lnk};
-        self.head_link = Arc::new(RwLock::new(Some (node)));
+        
+         match &self.head_link {
+             Some(prev_head) => {//reference prev_head
+                                    let temp = prev_head.clone();
+                                    self.head_link = Some(Arc::new(RwLock::new(Node {data: component, rest: Some(temp)})))
+                                },
+             None => {self.head_link= Some(Arc::new(RwLock::new(Node {data: component, rest: None})));
+                                    self.size = self.size + 1;}
+         }
+        
     }
 
     pub fn pop(&mut self) -> Option<Armor> {
-        //first, get the head link
-        let head = self.head_link;
-        //get the underlying node
-        let node = *(head.deref()).borrow_mut();
         //pattern match
-        match node {
+        match &self.head_link.clone() {
             None => None,
-            Some(n) => {let output = Some (n.data);
-                        //advance head link
-                        self.head_link = Arc::clone(node.rest);
-                        return output;}
+            Some(head) => {
+                            let output = (head).read().unwrap();//extract node
+                            //reassign head link to output.rest
+                             self.head_link = output.rest.clone();
+                             self.size = self.size - 1;
+                             return Some(output.data);
+                            }
         }
+        
+        
+        
     }
 }
 

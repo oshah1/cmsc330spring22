@@ -35,7 +35,7 @@ pub fn in_range(ls: &[i32], s: i32, e: i32) -> i32 {
 pub fn subset<T: PartialEq>(set: &[T], target: &[T]) -> bool {
     let mut result = true;
     for i in target.iter() {
-        let has_elem = false;
+        let mut has_elem = false;
         /*check if set contains an element in target*/
         //if so, do nothing
         //else, set result to false
@@ -77,9 +77,10 @@ pub fn to_decimal(ls: &[i32]) -> i32 {
     
     let mut counter = 0;
     let mut result = 0;
-    for i in ls.iter.rev() {
+    for i in ls.iter().rev() {
         let xpow = 2_i32.pow(counter);
         result = result + (*i * xpow);
+        counter = counter + 1;
     }
     result
 }
@@ -106,7 +107,6 @@ fn is_prime (num: &u32) -> bool {
 pub fn factorize(n: u32) -> Vec<u32> {
     let mut result:Vec<u32> = Vec::new();
     /*Find the first number that divides 36, then factorize the divisor*/
-    let mut i = 2;
     
     for i in 2..n {
         //check if i is prime
