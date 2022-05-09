@@ -5,3 +5,4 @@ authors = []
 edition = "2018"
 
 [dependencies]
+regex = "0.2"

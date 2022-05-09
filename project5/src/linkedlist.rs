@@ -109,28 +109,57 @@ impl Suit {
     
     pub fn is_compatible(&self) -> bool {
 
-        fn is_compatible_aux(lst:&mut List, v:&i32) -> bool {
+        fn is_compatible_aux(lnk:&Link, v:&i32) -> bool {
             
-            //pop armor off of lst
-            let curr = lst.pop();
-            //match curr
-            match curr {
+            
+            //match the node
+            match lnk {
                 None => true,
-                Some (n) => {if n.version == *v {
-                        is_compatible_aux(lst,&v)
-                    } else {
-                        false
+                Some(n) => {let node = n.read().unwrap();//get the node
+                            let version = node.data.version;//get the version
+                            if version == *v {//compare the version
+                                return is_compatible_aux(&node.rest, &v);
+                            } else {
+                                return false;
+                            }
                     }
-                }
-
             }
-            
+              
         }
-        let mut armor = self.armor.clone();
-        is_compatible_aux(&mut armor,&self.version)
+        let armor = self.armor.head_link.clone();
+        is_compatible_aux(&armor,&self.version)
     }
 
     pub fn repair(&mut self) {
-        unimplemented!()
+        //first, get the head link
+        let head = self.armor.head_link.clone();
+        fn repair_aux(curr: &Link) {
+            //match the underlying node
+            if let Some(n) = curr {
+                //extract the node
+                let mut node = n.write().unwrap();
+                //get the armor
+                let mut armor = &mut node.data;
+                //match the armor
+                match armor.component {
+                    
+                    Component::LeftThrusters(b, i) if b==true && i < 100 => {armor.component = Component::LeftThrusters(false,100)}, 
+                    Component::RightThrusters(b, i) if b==true && i < 100 => {armor.component = Component::RightThrusters(false,100)},
+                    Component::LeftRepulsor(b, i) if b==true && i < 100 => {armor.component = Component::LeftRepulsor(false,100)},
+                    Component::RightRepulsor(b, i) if b==true && i < 100 => {armor.component = Component::RightRepulsor(false,100)},
+                    Component::ChestPiece(b, i) if b==true && i < 100 => {armor.component = Component::ChestPiece(false,100)},
+                    Component::Helmet(b) if !b => {armor.component = Component::Helmet(true)},
+                         
+                    Component::ArcReactor(i) if i < 100 => {armor.component = Component::ArcReactor(100)},
+                    Component::Wifi(b) if !b => {armor.component = Component::Wifi(true)},
+                    _ => {}
+                }
+                //get the rest of the node
+                let next = &node.rest;
+                repair_aux(next);
+            }
+        }
+        repair_aux(&head)
+        
     }
 }

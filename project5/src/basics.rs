@@ -3,7 +3,7 @@
     If n is less than 0, return -1
 **/
 pub fn gauss(n: i32) -> i32 {
-    if n > 0 {
+    if n < 0 {
         return -1
     } else if n == 0 {
         return 1
@@ -92,47 +92,34 @@ pub fn to_decimal(ls: &[i32]) -> i32 {
     Ex: factorize of 36 should return [2,2,3,3] since 36 = 2 * 2 * 3 * 3
 **/
 //assume every number passed in is at least 2
-fn is_prime (num: &u32) -> bool {
-    let x = *num;
-    for i in 2..x {
-        //if i can divide n and isn't also n,
-        //then the number is not prime
-        if (x % i == 0) && (i!=x) {
-            return false
-        }
-    }
-    true
-}
 
 pub fn factorize(n: u32) -> Vec<u32> {
     let mut result:Vec<u32> = Vec::new();
     /*Find the first number that divides 36, then factorize the divisor*/
-    
-    for i in 2..n {
-        //check if i is prime
-        if is_prime(&i) {
-            //check if i evenly divides n
-            if n%i == 0 {
-                //save i
-                result.push(*(&i));
-                //divide n by i
-                let quot = n/i;
-                //check if quot is 1
-                if quot >= 2 {
-                    //if not, factorize the quotient
-                    let mut factors = factorize(quot);
-                    //append factors to result
-                    result.append(&mut factors);
-                }
-                //end the loop
-                break;
-            }
-        }
-        
-
+    let mut num = n;
+    //figure out how many 2's divide n
+    while num % 2 ==0 {
+        result.push(2);
+        num = num/2;
     }
-    result
-}
+        //get the square root of n
+        
+        let mut i = 3;
+        while (i as f64) <= (num as f64).sqrt() {
+            while num%i == 0 {
+                result.push(i);
+                num = num/i;
+            }
+            i = i + 2;
+        }
+
+        if num > 2 {
+            result.push(num);
+        }
+        result
+    }
+    
+
 
 /** 
     Takes all of the elements of the given slice and creates a new vector.
@@ -162,13 +149,15 @@ pub fn rotate(lst: &[i32]) -> Vec<i32> {
     Ex: "ace" is a substring of "rustacean"
 **/
 pub fn substr(s: &String, target: &str) -> bool {
+    
     let s_len = s.len();
     let target_len = target.len();
-    for i in 0..(s_len-target_len) {
-        let sl = &s[i..(i + target_len - 1)];
-        if target == sl {
-            return true
-        }
+    for i in 0..(s_len-target_len+1) {
+        let sl = &s[i..];//extract a slice from i onwards
+        println!("{}",&target);
+        println!("{}",&sl);
+        if sl.starts_with(target) {return true;}
+        
     }
     false
 }
@@ -182,35 +171,42 @@ pub fn substr(s: &String, target: &str) -> bool {
     EX: longest_sequence of "" is None
 **/
 pub fn longest_sequence(s: &str) -> Option<&str> {
-    let mut result = "";//tracks longest sequence
-    let mut max_seq_len = 0;//tracks max sequence length
-    let len = s.len();
+    let mut result = None;//stores result
+    let mut prev_char = None;//stores previous character
+    let mut max_seq_len = 0;//stores length of longest sequence
+    let mut max_seq_start = 0;
     
-    let mut curr_seq_begins = 0;//track what index a sequence starts
-    let mut curr_seq_ends = 0;
-    if len == 0 {
-        return None;
-        } else {
-        for i in 0..(len - 1) {
-            let curr = &s[i..i];//current character
-            if result.len() == 0 {
+    let mut curr_seq_len = 0;//current sequence length
+    let mut curr_seq_start = 0;
+    for (pos, ch )in s.char_indices() {
+        
+        if let Some(c) = prev_char {
+            //if c matches the current char,
+            //the sequence continues
+            //otherwise, we start a new sequence
+            if c != ch {
+                //we are starting a new sequence
+                //reset curr_seq_len
+                
+                curr_seq_len = 0;
+                //set current sequence start to the current
+                //position
+                curr_seq_start = pos;
 
-            } else {
-                //Check last character of the current sequence
-                //if it's different than the current character, we have started a new sequence
-                if &s[curr_seq_ends..curr_seq_ends] != curr {
-                    curr_seq_begins = i;//update start of current sequence
-                    
-                }
             }
-            curr_seq_ends = i;//update end of current sequence
-            let curr_seq = &s[curr_seq_begins..curr_seq_ends];
-            if curr_seq.len() > max_seq_len {
-                result = curr_seq;
-                max_seq_len = curr_seq.len();
-            }
+        }//else do nothing
+        //println!("c: {} pos: {}",&ch,&pos);
+        prev_char = Some(ch);
+        curr_seq_len = curr_seq_len + 1;
+        if curr_seq_len > max_seq_len {
+            max_seq_len = curr_seq_len;
+            max_seq_start = curr_seq_start;
         }
+        
     }
-
-    Some(result)
+    
+    if max_seq_len > 0 {
+        result = Some (&s[max_seq_start..max_seq_start + max_seq_len]);
+    }
+    result
 }
